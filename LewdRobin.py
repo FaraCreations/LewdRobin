@@ -35,7 +35,7 @@ dname = os.path.dirname(ap(__file__))
 initialize = {}
 initialize["guildCommands"] = True
 initialize["globalCommands"] = True
-botToken = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+botToken = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
 headers = {"Authorization": f"Bot {botToken}"}
 promptReminder = "\n*Reactions: :white_check_mark: join this prompt; :negative_squared_cross_mark: drop from the prompt; :play_pause: pause or resume the prompt;  :arrows_counterclockwise: generate a new prompt; :question: open the help menu.*"
 listEnvironments = []
@@ -52,11 +52,12 @@ os.chdir(dname)
 
 #classes
 class ld:
-    def __init__(self, listName, text, *args):
+    def __init__(self, text, *args):
         self.text = text
         self.tags = []
         for i in args:
             self.tags.append(i)
+    def addTo(self, listName):
         listName.append(self)
 
 class Interaction:
@@ -72,221 +73,226 @@ class Interaction:
 
 # function library
 def listPopulator():
+    listEnvironments.clear()
+    listCharacterTypes.clear()
+    listCharacterSpecies.clear()
+    listScenes.clear()
+    listPlay.clear()
     year = dtt.today().year
-    ld(listEnvironments, 'Hiroshima, Japan, Era of Living Kami', 'japan', 'fantasy')
-    ld(listEnvironments, 'Kyoto, Japan, 1708', 'japan', 'historical')
-    ld(listEnvironments, 'Kawagoe Village, Japan, 1545', 'japan', 'historical')
-    ld(listEnvironments, 'Tokyo, Japan, 1979', 'japan', 'historical')
-    ld(listEnvironments, f'Osaka, Japan, {year}', 'japan', 'modern')
-    ld(listEnvironments, f'Mount Fuji, Japan, {year}', 'japan', 'modern')
-    ld(listEnvironments, 'Tokyo, Japan, 2050', 'japan', 'futuristic')
-    ld(listEnvironments, 'Tokyo ULTRA, Geosynchronous Orbit above Japan, 2364', 'japan', 'futuristic')
-    ld(listEnvironments, 'Avalon, Arthurian England', 'europe', 'fantasy')
-    ld(listEnvironments, 'Crete, Greece, Mythical Era', 'europe', 'fantasy')
-    ld(listEnvironments, 'London, England, 1941', 'europe', 'historical')
-    ld(listEnvironments, 'Paris, France, 1789', 'europe', 'historical')
-    ld(listEnvironments, 'Rome, Italy, 117 AD', 'europe', 'historical')
-    ld(listEnvironments, 'Roskilde, Denmark, 1069', 'europe', 'historical')
-    ld(listEnvironments, f'Liverpool, England, {year}', 'europe', 'modern')
-    ld(listEnvironments, f'Cote d\'Azure, France, {year}', 'europe', 'modern')
-    ld(listEnvironments, f'The Alps, Switzerland, {year}', 'europe', 'modern')
-    ld(listEnvironments, f'Berlin, Germany, {year}', 'europe', 'modern')
-    ld(listEnvironments, 'Fallen London, England Undersea, 2146', 'europe', 'futuristic', 'fantasy')
-    ld(listEnvironments, 'Conclave of the United Earth, Switzerland, 2285', 'europe', 'futuristic')
-    ld(listEnvironments, 'Pink District, French Space Elevator, 2099', 'europe', 'futuristic')
-    ld(listEnvironments, 'NSS Ragnarok, Oslo Spaceport, Norway, 2323', 'europe', 'futuristic')
-    ld(listEnvironments, 'Boston, Massachusets, 1776', 'america', 'historical')
-    ld(listEnvironments, 'Plymouth, Massachutsets, 1620', 'america', 'historical')
-    ld(listEnvironments, 'New Orleans, Louisiana, 1803', 'america', 'historical')
-    ld(listEnvironments, 'Sedona, Arizona, 1895', 'america', 'historical')
-    ld(listEnvironments, 'San Francisco, California, 1969', 'america', 'historical')
-    ld(listEnvironments, 'Chicago, Illinois, 1920', 'america', 'historical')
-    ld(listEnvironments, f'Los Angelas, California, {year}', 'america', 'modern')
-    ld(listEnvironments, f'Austin, Texas, {year}', 'america', 'modern')
-    ld(listEnvironments, f'New York, New York, {year}', 'america', 'modern')
-    ld(listEnvironments, f'Key West, Florida, {year}', 'america', 'modern')
-    ld(listEnvironments, f'Spokane, Washington, {year}', 'america', 'modern')
-    ld(listEnvironments, 'Shady Sands, New California Republic, 2196', 'america', 'futuristic')
-    ld(listEnvironments, 'VirtuVegas, Nevadan Cyberspace, 2088', 'america', 'futuristic')
-    ld(listEnvironments, 'Unity City, Worker\'s Republic of America, 2121', 'america', 'futuristic')
-    ld(listEnvironments, 'Shady Sands, New California Republic, 2196', 'america', 'futuristic')
-    ld(listEnvironments, 'Hudson Arcology 4, New York, 2250', 'america', 'futuristic')
-    ld(listEnvironments, 'Palace of the Omnarch, Earth Lagrange 1, 80th Year of the 4th Imperial Era', 'futuristic')
-    ld(listEnvironments, 'Flagstand, Mare Tranquillitatis, Luna, 2065', 'futuristic')
-    ld(listEnvironments, 'New California, Valles Marineris, Mars, 2206', 'futuristic')
-    ld(listEnvironments, 'ESS Conquistador, Interstellar Space, 2330', 'futuristic')
-    ld(listEnvironments, 'Last Hope Outpost, Alpha Centaura-3, 2440', 'futuristic')
-    ld(listEnvironments, 'Waterdeep, The Sword Coast, Faerûn', 'fantasy')
-    ld(listEnvironments, 'The Shire, Middle Earth', 'fantasy')
-    ld(listEnvironments, 'Mithranous, Tevinter Imperium, Thedas', 'fantasy')
-    ld(listEnvironments, 'Beauclair, Toussaint', 'fantasy')
-    ld(listCharacterTypes, 'trans man', 'trans_men')
-    ld(listCharacterTypes, 'trans woman', 'trans_women')
-    ld(listCharacterTypes, 'cis woman', 'cis_women')
-    ld(listCharacterTypes, 'cis man', 'cis_men')
-    ld(listCharacterTypes, 'enby', 'nonbinary')
-    ld(listCharacterTypes, 'futanari', 'futanari')
-    ld(listCharacterSpecies, 'an anthro cat', 'mammals')
-    ld(listCharacterSpecies, 'an anthro tiger', 'mammals')
-    ld(listCharacterSpecies, 'an anthro dog', 'mammals')
-    ld(listCharacterSpecies, 'an anthro wolf', 'mammals')
-    ld(listCharacterSpecies, 'an anthro fox', 'mammals')
-    ld(listCharacterSpecies, 'an anthro bear', 'mammals')
-    ld(listCharacterSpecies, 'an anthro mouse', 'mammals')
-    ld(listCharacterSpecies, 'an anthro rabbit', 'mammals')
-    ld(listCharacterSpecies, 'an anthro snake', 'reptiles')
-    ld(listCharacterSpecies, 'an anthro lizard', 'reptiles')
-    ld(listCharacterSpecies, 'an anthro dragon', 'reptiles')
-    ld(listCharacterSpecies, 'an anthro fish', 'fish')
-    ld(listCharacterSpecies, 'an anthro shark', 'fish')
-    ld(listCharacterSpecies, 'an anthro octopus', 'fish')
-    ld(listCharacterSpecies, 'an anthro squid', 'fish')
-    ld(listCharacterSpecies, 'an anthro ant', 'insects')
-    ld(listCharacterSpecies, 'an anthro wasp', 'insects')
-    ld(listCharacterSpecies, 'an anthro bee', 'insects')
-    ld(listCharacterSpecies, 'an anthro mantis', 'insects')
-    ld(listCharacterSpecies, 'an anthro spider', 'arachnids')
-    ld(listCharacterSpecies, 'an anthro scorpion', 'arachnids')
-    ld(listCharacterSpecies, 'a human', 'humans')
-    ld(listCharacterSpecies, 'a half-elf', 'elves')
-    ld(listCharacterSpecies, 'a high elf', 'elves')
-    ld(listCharacterSpecies, 'a wood elf', 'elves')
-    ld(listCharacterSpecies, 'a drow', 'elves')
-    ld(listCharacterSpecies, 'a hill dwarf', 'dwarves')
-    ld(listCharacterSpecies, 'a mountain dwarf', 'dwarves')
-    ld(listCharacterSpecies, 'a deep dwarf', 'dwarves')
-    ld(listCharacterSpecies, 'a lightfoot halfling', 'halflings')
-    ld(listCharacterSpecies, 'a stout halfling', 'halflings')
-    ld(listCharacterSpecies, 'a gnome', 'gnomes')
-    ld(listCharacterSpecies, 'a deep gnome', 'gnomes')
-    ld(listCharacterSpecies, 'a demon-blooded tiefling', 'tieflings')
-    ld(listCharacterSpecies, 'a devil-blooded tiefling', 'tieflings')
-    ld(listCharacterSpecies, 'a fae-blooded tiefling', 'tieflings')
-    ld(listCharacterSpecies, 'a dragon-blooded tiefling', 'tieflings')
-    ld(listCharacterSpecies, 'an eldritch-blooded tiefling', 'tieflings')
-    ld(listCharacterSpecies, 'a merfolk', 'merfolk')
-    ld(listCharacterSpecies, 'an orc', 'orcs')
-    ld(listCharacterSpecies, 'a half-orc', 'orcs')
-    ld(listCharacterSpecies, 'a half-giant', 'goliaths')
-    ld(listCharacterSpecies, 'a goblin', 'goblinoids')
-    ld(listCharacterSpecies, 'a hobgoblin', 'goblinoids')
-    ld(listCharacterSpecies, 'a bugbear', 'goblinoids')
-    ld(listCharacterSpecies, 'a mind flayer', 'illithids')
-    ld(listCharacterSpecies, 'a slime', 'slimes')
-    ld(listCharacterSpecies, 'an ooze', 'slimes')
-    ld(listCharacterSpecies, 'a jelly', 'slimes')
-    ld(listCharacterSpecies, 'a tentacle monster', 'tentacles')
-    ld(listCharacterSpecies, 'a tentacle-sprouting', 'tentacles')
-    ld(listCharacterSpecies, 'a forest dryad', 'dryads')
-    ld(listCharacterSpecies, 'a wood nymph', 'dryads')
-    ld(listCharacterSpecies, 'a vine-sprouting dryad', 'dryads')
-    ld(listCharacterSpecies, 'a harpy', 'harpies')
-    ld(listCharacterSpecies, 'a lamia', 'lamias')
-    ld(listCharacterSpecies, 'a centaur', 'centaurs')
-    ld(listCharacterSpecies, 'a minotaur', 'minotaurs')
-    ld(listCharacterSpecies, 'a hill giant', 'giants')
-    ld(listCharacterSpecies, 'a frost giant', 'giants')
-    ld(listCharacterSpecies, 'a fire giant', 'giants')
-    ld(listCharacterSpecies, 'a troll', 'giants')
-    ld(listCharacterSpecies, 'an ogre', 'giants')
-    ld(listCharacterSpecies, 'a werewolf', 'werebeasts')
-    ld(listCharacterSpecies, 'a weretiger', 'werebeasts')
-    ld(listCharacterSpecies, 'a werebear', 'werebeasts')
-    ld(listCharacterSpecies, 'a wereshark', 'werebeasts')
-    ld(listCharacterSpecies, 'a fledgling vampire', 'vampires')
-    ld(listCharacterSpecies, 'a vampire', 'vampires')
-    ld(listCharacterSpecies, 'an elder vampire', 'vampires')
-    ld(listCharacterSpecies, 'a zombie', 'undead')
-    ld(listCharacterSpecies, 'a lich', 'undead')
-    ld(listCharacterSpecies, 'a mummy', 'undead')
-    ld(listCharacterSpecies, 'a ghost', 'undead')
-    ld(listCharacterSpecies, 'a half-demon', 'demons')
-    ld(listCharacterSpecies, 'a demon', 'demons')
-    ld(listCharacterSpecies, 'a devil', 'demons')
-    ld(listCharacterSpecies, 'an archdemon', 'demons')
-    ld(listCharacterSpecies, 'a succubus', 'demons')
-    ld(listCharacterSpecies, 'an incubus', 'demons')
-    ld(listCharacterSpecies, 'an angel', 'angels')
-    ld(listCharacterSpecies, 'an archangel', 'angels')
-    ld(listCharacterSpecies, 'a cherubim', 'angels')
-    ld(listCharacterSpecies, 'a seraphim', 'angels')
-    ld(listCharacterSpecies, 'a sprite', 'faeries')
-    ld(listCharacterSpecies, 'a fairy', 'faeries')
-    ld(listCharacterSpecies, 'a changeling', 'faeries')
-    ld(listCharacterSpecies, 'a half-fae', 'faeries')
-    ld(listCharacterSpecies, 'a fae', 'faeries')
-    ld(listCharacterSpecies, 'a archfae', 'faeries')
-    ld(listCharacterSpecies, 'a cyborg', 'cyborgs')
-    ld(listCharacterSpecies, 'a heavily implanted', 'cyborgs')
-    ld(listCharacterSpecies, 'a metal-armed', 'cyborgs')
-    ld(listCharacterSpecies, 'a metal-legged', 'cyborgs')
-    ld(listCharacterSpecies, 'a synthetic', 'androids')
-    ld(listCharacterSpecies, 'an android', 'androids')
-    ld(listCharacterSpecies, 'a covert android', 'androids')
-    ld(listCharacterSpecies, 'a military android', 'androids')
-    ld(listCharacterSpecies, 'a robotic', 'robots')
-    ld(listCharacterSpecies, 'a robot', 'robots')
-    ld(listCharacterSpecies, 'a many-limbed robotic', 'robots')
-    ld(listCharacterSpecies, 'a vehicular robot', 'robots')
-    ld(listCharacterSpecies, 'a blue psychic alien', 'humanoid_aliens')
-    ld(listCharacterSpecies, 'a bulky warlike alien', 'humanoid_aliens')
-    ld(listCharacterSpecies, 'a tall aquiline alien', 'humanoid_aliens')
-    ld(listCharacterSpecies, 'a short furred alien', 'humanoid_aliens')
-    ld(listCharacterSpecies, 'an incorporeal alien', 'aliens')
-    ld(listCharacterSpecies, 'a bestial alien', 'aliens')
-    ld(listCharacterSpecies, 'a many-appendaged alien', 'aliens')
-    ld(listCharacterSpecies, 'a multiple-bodied alien', 'aliens')
-    ld(listScenes, 'cthonic ritual, Altar to the Deep Ones', 'fantasy')
-    ld(listScenes, 'demonic binding, Coven of the Seven', 'fantasy')
-    ld(listScenes, 'Little Shoppe of Tentacles, Night Market', 'fantasy', 'modern')
-    ld(listScenes, 'tea service, Café Neko Neko', 'modern')
-    ld(listScenes, 'morning coffee, Sablestone Coffee', 'modern')
-    ld(listScenes, 'romantic dinner, Cosa Fiorenta', 'modern')
-    ld(listScenes, 'drinks with friends, Club Ziggurat', 'modern')
-    ld(listScenes, 'doomsday lockdown, PrepTech Luxury Vault 404', 'futuristic')
-    ld(listScenes, 'gladitorial games, BloodRage Cyber Arena', 'futuristic')
-    ld(listScenes, 'stuck in aerial traffic, Clydesdale HoverLimo', 'futuristic')
-    ld(listScenes, 'ripperdoc clinic, Kotari Void-Market', 'futuristic')
-    ld(listScenes, 'partaking of emotion-vapor, Neon Death Snail Vape Bar, Pleasuretown', 'futuristic')
-    ld(listScenes, 'shuttle malfunction, TeslaShuttle T-72', 'futuristic')
-    ld(listScenes, 'regional lockdown, Invasion of Unkonwn Extraterestrials', 'futuristic')
-    ld(listScenes, 'celebration of the Moon Godess, forest clearing', 'fantasy', 'historical')
-    ld(listScenes, 'practical eromancy class, Universitas Arcanorum', 'fantasy', 'modern')
-    ld(listScenes, 'lecture on defense against demonic temptation, Sanctum of Gilded Light', 'fantasy', 'historical')
-    ld(listScenes, 'Comparative Sexuality SEX:2369, Wellspray College', 'college')
-    ld(listScenes, 'office hours, Dyne Hall for Applied Chemistry, Wellspray College', 'college')
-    ld(listScenes, 'wild party, ΑΒΩ House, Hedera University', 'modern')
-    ld(listScenes, 'dorm move-in day, Reed Hall, Hedera University', 'modern')
-    ld(listScenes, 'harvest festival, Honeydrop Farm', 'historical')
-    ld(listScenes, 'strangers visiting a farmhouse, Honeydrop Farm', 'historical')
-    ld(listScenes, 'wagon broken down, Unnamed Town', 'historical')
-    ld(listScenes, 'visitors arriving after dark, Unnamed Town', 'historical')
-    ld(listScenes, 'city under siege, Devilspawn Invasion', 'historical', 'fantasy')
-    ld(listScenes, 'dark alley, Tavern District', 'historical')
-    ld(listScenes, 'conscripted into militia, Ironspike Garrison', 'historical')
-    ld(listScenes, 'summoned for royal feast, Grand Hall, Ebongold Palace', 'historical')
+    ld('Hiroshima, Japan, Era of Living Kami', 'japan', 'fantasy').addTo(listEnvironments)
+    ld('Kyoto, Japan, 1708', 'japan', 'historical').addTo(listEnvironments)
+    ld('Kawagoe Village, Japan, 1545', 'japan', 'historical').addTo(listEnvironments)
+    ld('Tokyo, Japan, 1979', 'japan', 'historical').addTo(listEnvironments)
+    ld(f'Osaka, Japan, {year}', 'japan', 'modern').addTo(listEnvironments)
+    ld(f'Mount Fuji, Japan, {year}', 'japan', 'modern').addTo(listEnvironments)
+    ld('Tokyo, Japan, 2050', 'japan', 'futuristic').addTo(listEnvironments)
+    ld('Tokyo ULTRA, Geosynchronous Orbit above Japan, 2364', 'japan', 'futuristic').addTo(listEnvironments)
+    ld('Avalon, Arthurian England', 'europe', 'fantasy').addTo(listEnvironments)
+    ld('Crete, Greece, Mythical Era', 'europe', 'fantasy').addTo(listEnvironments)
+    ld('London, England, 1941', 'europe', 'historical').addTo(listEnvironments)
+    ld('Paris, France, 1789', 'europe', 'historical').addTo(listEnvironments)
+    ld('Rome, Italy, 117 AD', 'europe', 'historical').addTo(listEnvironments)
+    ld('Roskilde, Denmark, 1069', 'europe', 'historical').addTo(listEnvironments)
+    ld(f'Liverpool, England, {year}', 'europe', 'modern').addTo(listEnvironments)
+    ld(f'Cote d\'Azure, France, {year}', 'europe', 'modern').addTo(listEnvironments)
+    ld(f'The Alps, Switzerland, {year}', 'europe', 'modern').addTo(listEnvironments)
+    ld(f'Berlin, Germany, {year}', 'europe', 'modern').addTo(listEnvironments)
+    ld('Fallen London, England Undersea, 2146', 'europe', 'futuristic', 'fantasy').addTo(listEnvironments)
+    ld('Conclave of the United Earth, Switzerland, 2285', 'europe', 'futuristic').addTo(listEnvironments)
+    ld('Pink District, French Space Elevator, 2099', 'europe', 'futuristic').addTo(listEnvironments)
+    ld('NSS Ragnarok, Oslo Spaceport, Norway, 2323', 'europe', 'futuristic').addTo(listEnvironments)
+    ld('Boston, Massachusets, 1776', 'america', 'historical').addTo(listEnvironments)
+    ld('Plymouth, Massachutsets, 1620', 'america', 'historical').addTo(listEnvironments)
+    ld('New Orleans, Louisiana, 1803', 'america', 'historical').addTo(listEnvironments)
+    ld('Sedona, Arizona, 1895', 'america', 'historical').addTo(listEnvironments)
+    ld('San Francisco, California, 1969', 'america', 'historical').addTo(listEnvironments)
+    ld('Chicago, Illinois, 1920', 'america', 'historical').addTo(listEnvironments)
+    ld(f'Los Angelas, California, {year}', 'america', 'modern').addTo(listEnvironments)
+    ld(f'Austin, Texas, {year}', 'america', 'modern').addTo(listEnvironments)
+    ld(f'New York, New York, {year}', 'america', 'modern').addTo(listEnvironments)
+    ld(f'Key West, Florida, {year}', 'america', 'modern').addTo(listEnvironments)
+    ld(f'Spokane, Washington, {year}', 'america', 'modern').addTo(listEnvironments)
+    ld('Shady Sands, New California Republic, 2196', 'america', 'futuristic').addTo(listEnvironments)
+    ld('VirtuVegas, Nevadan Cyberspace, 2088', 'america', 'futuristic').addTo(listEnvironments)
+    ld('Unity City, Worker\'s Republic of America, 2121', 'america', 'futuristic').addTo(listEnvironments)
+    ld('Shady Sands, New California Republic, 2196', 'america', 'futuristic').addTo(listEnvironments)
+    ld('Hudson Arcology 4, New York, 2250', 'america', 'futuristic').addTo(listEnvironments)
+    ld('Palace of the Omnarch, Earth Lagrange 1, 80th Year of the 4th Imperial Era', 'futuristic').addTo(listEnvironments)
+    ld('Flagstand, Mare Tranquillitatis, Luna, 2065', 'futuristic').addTo(listEnvironments)
+    ld('New California, Valles Marineris, Mars, 2206', 'futuristic').addTo(listEnvironments)
+    ld('ESS Conquistador, Interstellar Space, 2330', 'futuristic').addTo(listEnvironments)
+    ld('Last Hope Outpost, Alpha Centaura-3, 2440', 'futuristic').addTo(listEnvironments)
+    ld('Waterdeep, The Sword Coast, Faerûn', 'fantasy').addTo(listEnvironments)
+    ld('The Shire, Middle Earth', 'fantasy').addTo(listEnvironments)
+    ld('Mithranous, Tevinter Imperium, Thedas', 'fantasy').addTo(listEnvironments)
+    ld('Beauclair, Toussaint', 'fantasy').addTo(listEnvironments)
+    ld('trans man', 'trans_men').addTo(listCharacterTypes)
+    ld('trans woman', 'trans_women').addTo(listCharacterTypes)
+    ld('cis woman', 'cis_women').addTo(listCharacterTypes)
+    ld('cis man', 'cis_men').addTo(listCharacterTypes)
+    ld('enby', 'nonbinary').addTo(listCharacterTypes)
+    ld('futanari', 'futanari').addTo(listCharacterTypes)
+    ld('an anthro cat', 'mammals').addTo(listCharacterSpecies)
+    ld('an anthro tiger', 'mammals').addTo(listCharacterSpecies)
+    ld('an anthro dog', 'mammals').addTo(listCharacterSpecies)
+    ld('an anthro wolf', 'mammals').addTo(listCharacterSpecies)
+    ld('an anthro fox', 'mammals').addTo(listCharacterSpecies)
+    ld('an anthro bear', 'mammals').addTo(listCharacterSpecies)
+    ld('an anthro mouse', 'mammals').addTo(listCharacterSpecies)
+    ld('an anthro rabbit', 'mammals').addTo(listCharacterSpecies)
+    ld('an anthro snake', 'reptiles').addTo(listCharacterSpecies)
+    ld('an anthro lizard', 'reptiles').addTo(listCharacterSpecies)
+    ld('an anthro dragon', 'reptiles').addTo(listCharacterSpecies)
+    ld('an anthro fish', 'fish').addTo(listCharacterSpecies)
+    ld('an anthro shark', 'fish').addTo(listCharacterSpecies)
+    ld('an anthro octopus', 'fish').addTo(listCharacterSpecies)
+    ld('an anthro squid', 'fish').addTo(listCharacterSpecies)
+    ld('an anthro ant', 'insects').addTo(listCharacterSpecies)
+    ld('an anthro wasp', 'insects').addTo(listCharacterSpecies)
+    ld('an anthro bee', 'insects').addTo(listCharacterSpecies)
+    ld('an anthro mantis', 'insects').addTo(listCharacterSpecies)
+    ld('an anthro spider', 'arachnids').addTo(listCharacterSpecies)
+    ld('an anthro scorpion', 'arachnids').addTo(listCharacterSpecies)
+    ld('a human', 'humans').addTo(listCharacterSpecies)
+    ld('a half-elf', 'elves').addTo(listCharacterSpecies)
+    ld('a high elf', 'elves').addTo(listCharacterSpecies)
+    ld('a wood elf', 'elves').addTo(listCharacterSpecies)
+    ld('a drow', 'elves').addTo(listCharacterSpecies)
+    ld('a hill dwarf', 'dwarves').addTo(listCharacterSpecies)
+    ld('a mountain dwarf', 'dwarves').addTo(listCharacterSpecies)
+    ld('a deep dwarf', 'dwarves').addTo(listCharacterSpecies)
+    ld('a lightfoot halfling', 'halflings').addTo(listCharacterSpecies)
+    ld('a stout halfling', 'halflings').addTo(listCharacterSpecies)
+    ld('a gnome', 'gnomes').addTo(listCharacterSpecies)
+    ld('a deep gnome', 'gnomes').addTo(listCharacterSpecies)
+    ld('a demon-blooded tiefling', 'tieflings').addTo(listCharacterSpecies)
+    ld('a devil-blooded tiefling', 'tieflings').addTo(listCharacterSpecies)
+    ld('a fae-blooded tiefling', 'tieflings').addTo(listCharacterSpecies)
+    ld('a dragon-blooded tiefling', 'tieflings').addTo(listCharacterSpecies)
+    ld('an eldritch-blooded tiefling', 'tieflings').addTo(listCharacterSpecies)
+    ld('a merfolk', 'merfolk').addTo(listCharacterSpecies)
+    ld('an orc', 'orcs').addTo(listCharacterSpecies)
+    ld('a half-orc', 'orcs').addTo(listCharacterSpecies)
+    ld('a half-giant', 'goliaths').addTo(listCharacterSpecies)
+    ld('a goblin', 'goblinoids').addTo(listCharacterSpecies)
+    ld('a hobgoblin', 'goblinoids').addTo(listCharacterSpecies)
+    ld('a bugbear', 'goblinoids').addTo(listCharacterSpecies)
+    ld('a mind flayer', 'illithids').addTo(listCharacterSpecies)
+    ld('a slime', 'slimes').addTo(listCharacterSpecies)
+    ld('an ooze', 'slimes').addTo(listCharacterSpecies)
+    ld('a jelly', 'slimes').addTo(listCharacterSpecies)
+    ld('a tentacle monster', 'tentacles').addTo(listCharacterSpecies)
+    ld('a tentacle-sprouting', 'tentacles').addTo(listCharacterSpecies)
+    ld('a forest dryad', 'dryads').addTo(listCharacterSpecies)
+    ld('a wood nymph', 'dryads').addTo(listCharacterSpecies)
+    ld('a vine-sprouting dryad', 'dryads').addTo(listCharacterSpecies)
+    ld('a harpy', 'harpies').addTo(listCharacterSpecies)
+    ld('a lamia', 'lamias').addTo(listCharacterSpecies)
+    ld('a centaur', 'centaurs').addTo(listCharacterSpecies)
+    ld('a minotaur', 'minotaurs').addTo(listCharacterSpecies)
+    ld('a hill giant', 'giants').addTo(listCharacterSpecies)
+    ld('a frost giant', 'giants').addTo(listCharacterSpecies)
+    ld('a fire giant', 'giants').addTo(listCharacterSpecies)
+    ld('a troll', 'giants').addTo(listCharacterSpecies)
+    ld('an ogre', 'giants').addTo(listCharacterSpecies)
+    ld('a werewolf', 'werebeasts').addTo(listCharacterSpecies)
+    ld('a weretiger', 'werebeasts').addTo(listCharacterSpecies)
+    ld('a werebear', 'werebeasts').addTo(listCharacterSpecies)
+    ld('a wereshark', 'werebeasts').addTo(listCharacterSpecies)
+    ld('a fledgling vampire', 'vampires').addTo(listCharacterSpecies)
+    ld('a vampire', 'vampires').addTo(listCharacterSpecies)
+    ld('an elder vampire', 'vampires').addTo(listCharacterSpecies)
+    ld('a zombie', 'undead').addTo(listCharacterSpecies)
+    ld('a lich', 'undead').addTo(listCharacterSpecies)
+    ld('a mummy', 'undead').addTo(listCharacterSpecies)
+    ld('a ghost', 'undead').addTo(listCharacterSpecies)
+    ld('a half-demon', 'demons').addTo(listCharacterSpecies)
+    ld('a demon', 'demons').addTo(listCharacterSpecies)
+    ld('a devil', 'demons').addTo(listCharacterSpecies)
+    ld('an archdemon', 'demons').addTo(listCharacterSpecies)
+    ld('a succubus', 'demons').addTo(listCharacterSpecies)
+    ld('an incubus', 'demons').addTo(listCharacterSpecies)
+    ld('an angel', 'angels').addTo(listCharacterSpecies)
+    ld('an archangel', 'angels').addTo(listCharacterSpecies)
+    ld('a cherubim', 'angels').addTo(listCharacterSpecies)
+    ld('a seraphim', 'angels').addTo(listCharacterSpecies)
+    ld('a sprite', 'faeries').addTo(listCharacterSpecies)
+    ld('a fairy', 'faeries').addTo(listCharacterSpecies)
+    ld('a changeling', 'faeries').addTo(listCharacterSpecies)
+    ld('a half-fae', 'faeries').addTo(listCharacterSpecies)
+    ld('a fae', 'faeries').addTo(listCharacterSpecies)
+    ld('a archfae', 'faeries').addTo(listCharacterSpecies)
+    ld('a cyborg', 'cyborgs').addTo(listCharacterSpecies)
+    ld('a heavily implanted', 'cyborgs').addTo(listCharacterSpecies)
+    ld('a metal-armed', 'cyborgs').addTo(listCharacterSpecies)
+    ld('a metal-legged', 'cyborgs').addTo(listCharacterSpecies)
+    ld('a synthetic', 'androids').addTo(listCharacterSpecies)
+    ld('an android', 'androids').addTo(listCharacterSpecies)
+    ld('a covert android', 'androids').addTo(listCharacterSpecies)
+    ld('a military android', 'androids').addTo(listCharacterSpecies)
+    ld('a robotic', 'robots').addTo(listCharacterSpecies)
+    ld('a robot', 'robots').addTo(listCharacterSpecies)
+    ld('a many-limbed robotic', 'robots').addTo(listCharacterSpecies)
+    ld('a vehicular robot', 'robots').addTo(listCharacterSpecies)
+    ld('a blue psychic alien', 'humanoid_aliens').addTo(listCharacterSpecies)
+    ld('a bulky warlike alien', 'humanoid_aliens').addTo(listCharacterSpecies)
+    ld('a tall aquiline alien', 'humanoid_aliens').addTo(listCharacterSpecies)
+    ld('a short furred alien', 'humanoid_aliens').addTo(listCharacterSpecies)
+    ld('an incorporeal alien', 'aliens').addTo(listCharacterSpecies)
+    ld('a bestial alien', 'aliens').addTo(listCharacterSpecies)
+    ld('a many-appendaged alien', 'aliens').addTo(listCharacterSpecies)
+    ld('a multiple-bodied alien', 'aliens').addTo(listCharacterSpecies)
+    ld('cthonic ritual, Altar to the Deep Ones', 'fantasy').addTo(listScenes)
+    ld('demonic binding, Coven of the Seven', 'fantasy').addTo(listScenes)
+    ld('Little Shoppe of Tentacles, Night Market', 'fantasy', 'modern').addTo(listScenes)
+    ld('tea service, Café Neko Neko', 'modern').addTo(listScenes)
+    ld('morning coffee, Sablestone Coffee', 'modern').addTo(listScenes)
+    ld('romantic dinner, Cosa Fiorenta', 'modern').addTo(listScenes)
+    ld('drinks with friends, Club Ziggurat', 'modern').addTo(listScenes)
+    ld('doomsday lockdown, PrepTech Luxury Vault 404', 'futuristic').addTo(listScenes)
+    ld('gladitorial games, BloodRage Cyber Arena', 'futuristic').addTo(listScenes)
+    ld('stuck in aerial traffic, Clydesdale HoverLimo', 'futuristic').addTo(listScenes)
+    ld('ripperdoc clinic, Kotari Void-Market', 'futuristic').addTo(listScenes)
+    ld('partaking of emotion-vapor, Neon Death Snail Vape Bar, Pleasuretown', 'futuristic').addTo(listScenes)
+    ld('shuttle malfunction, TeslaShuttle T-72', 'futuristic').addTo(listScenes)
+    ld('regional lockdown, Invasion of Unkonwn Extraterestrials', 'futuristic').addTo(listScenes)
+    ld('celebration of the Moon Godess, forest clearing', 'fantasy', 'historical').addTo(listScenes)
+    ld('practical eromancy class, Universitas Arcanorum', 'fantasy', 'modern').addTo(listScenes)
+    ld('lecture on defense against demonic temptation, Sanctum of Gilded Light', 'fantasy', 'historical').addTo(listScenes)
+    ld('Comparative Sexuality SEX:2369, Wellspray College', 'college').addTo(listScenes)
+    ld('office hours, Dyne Hall for Applied Chemistry, Wellspray College', 'college').addTo(listScenes)
+    ld('wild party, ABO House, Hedera University', 'modern').addTo(listScenes)
+    ld('dorm move-in day, Reed Hall, Hedera University', 'modern').addTo(listScenes)
+    ld('harvest festival, Honeydrop Farm', 'historical').addTo(listScenes)
+    ld('strangers visiting a farmhouse, Honeydrop Farm', 'historical').addTo(listScenes)
+    ld('wagon broken down, Unnamed Town', 'historical').addTo(listScenes)
+    ld('visitors arriving after dark, Unnamed Town', 'historical').addTo(listScenes)
+    ld('city under siege, Devilspawn Invasion', 'historical', 'fantasy').addTo(listScenes)
+    ld('dark alley, Tavern District', 'historical').addTo(listScenes)
+    ld('conscripted into militia, Ironspike Garrison', 'historical').addTo(listScenes)
+    ld('summoned for royal feast, Grand Hall, Ebongold Palace', 'historical').addTo(listScenes)
     playList = ['cuddling', 'petting', 'grinding', 'titjob', 'ass_play', 'anal_sex', 'manual_sex', 'oral_sex', 'intercrural_sex', 'penetrative_sex', 'age_play', 'bondage', 'biting', 'breast_play', 'orgasm_control', 'genitorture', 'cuckoldry', 'cupping', 'dom_and_sub', 'knife_play', 'electro_play', 'food_play', 'temperature_play', 'fire_play', 'fisting', 'foot_play', 'degradation', 'exhibition', 'pet_play', 'piss_play', 'consensual_nonconsent', 'sensory_deprivation', 'sounding', 'intoxicants', 'incest', 'bestiality', 'size_play', 'partial_growth', 'extreme_insertions', 'inflation', 'transformation', 'impregnation', 'oviposition', 'dubious_consent', 'nonconsent', 'torture', 'gore', 'soft_vore', 'hard_vore', 'snuff', 'necrophilia']
     for pl in playList:
-        ld(listPlay, f'{pl.replace("_", " ")}', pl)
-    ld(listPlay, 'handholding', 'romance')
-    ld(listPlay, 'a romantic date', 'romance')
-    ld(listPlay, 'soul staring', 'romance')
-    ld(listPlay, 'heartfelt confessions', 'romance')
-    ld(listPlay, 'kissing on the lips', 'kissing')
-    ld(listPlay, 'neck kissing', 'kissing')
-    ld(listPlay, 'hickies', 'kissing')
-    ld(listPlay, 'ear nibbling', 'kissing')
-    ld(listPlay, 'trailing kisses', 'kissing')
-    ld(listPlay, 'spanking', 'impact_play')
-    ld(listPlay, 'slapping', 'impact_play')
-    ld(listPlay, 'whipping', 'impact_play')
-    ld(listPlay, 'flogging', 'impact_play')
-    ld(listPlay, 'paddeling', 'impact_play')
-    ld(listPlay, 'caning', 'impact_play')
-    ld(listPlay, 'dildos', 'basic_toys')
-    ld(listPlay, 'vibrators', 'basic_toys')
-    ld(listPlay, 'hitachi', 'basic_toys')
-    ld(listPlay, 'fleshlights', 'basic_toys')
+        ld(f'{pl.replace("_", " ")}', pl).addTo(listPlay)
+    ld('handholding', 'romance').addTo(listPlay)
+    ld('a romantic date', 'romance').addTo(listPlay)
+    ld('soul staring', 'romance').addTo(listPlay)
+    ld('heartfelt confessions', 'romance').addTo(listPlay)
+    ld('kissing on the lips', 'kissing').addTo(listPlay)
+    ld('neck kissing', 'kissing').addTo(listPlay)
+    ld('hickies', 'kissing').addTo(listPlay)
+    ld('ear nibbling', 'kissing').addTo(listPlay)
+    ld('trailing kisses', 'kissing').addTo(listPlay)
+    ld('spanking', 'impact_play').addTo(listPlay)
+    ld('slapping', 'impact_play').addTo(listPlay)
+    ld('whipping', 'impact_play').addTo(listPlay)
+    ld('flogging', 'impact_play').addTo(listPlay)
+    ld('paddeling', 'impact_play').addTo(listPlay)
+    ld('caning', 'impact_play').addTo(listPlay)
+    ld('dildos', 'basic_toys').addTo(listPlay)
+    ld('vibrators', 'basic_toys').addTo(listPlay)
+    ld('hitachi', 'basic_toys').addTo(listPlay)
+    ld('fleshlights', 'basic_toys').addTo(listPlay)
 
 def getConfigInt(guildID, channelID, configName):
     config = configparser.ConfigParser()
@@ -393,174 +399,174 @@ def promptGenerator(guildID, channelID):
     europeNames["masc"] = ['Noel', 'Joel', 'Mateo', 'Ergi', 'Luis', 'Aron', 'Samuel', 'Roan', 'Roel', 'Xhoel', 'Marc', 'Eric', 'Jan', 'Daniel', 'Enzo', 'Ian', 'Pol', 'Àlex', 'Jordi', 'Marti', 'Lukas', 'Maximilian', 'Jakob', 'David', 'Tobias', 'Paul', 'Jonas', 'Felix', 'Alexander', 'Elias', 'Artsiom', 'Артем', 'Mikhail', 'Maksim', 'Максим', 'Ivan', 'Иван', 'Roman', 'Роман', 'Aleksandr', 'Александр', 'Danyl', 'Lucas', 'Louis', 'Noah', 'Nathan', 'Adam', 'Arthur', 'Mohamed', 'Victor', 'Mathis', 'Liam', 'Lucas', 'Liam', 'Louis', 'Wout', 'Mathis', 'Lars', 'Vince', 'Kobe', 'Finn', 'Noah', 'Nathan', 'Hugo', 'Louis', 'Theo', 'Ethan', 'Noah', 'Lucas', 'Gabriel', 'Arthur', 'Tom', 'Adam', 'Mohamed', 'Rayan', 'Gabriel', 'Anas', 'David', 'Lucas', 'Yanis', 'Nathan', 'Ibrahim', 'Ahmed', 'Daris', 'Amar', 'Davud', 'Adin', 'Hamza', 'Harun', 'Vedad', 'Imran', 'Tarik', 'Stefan', 'Luka', 'Lazar', 'Nikola', 'Pavle', 'David', 'Marko', 'Mihajlo', 'Andrej', 'Milos', 'Georgi', 'Aleksandar', 'Martin', 'Dimitar', 'Ivan', 'Nikolay', 'Nikola', 'Daniel', 'Viktor', 'Kristian', 'Luka', 'David', 'Ivan', 'Jakov', 'Marko', 'Petar', 'Filip', 'Matej', 'Mateo', 'Leon', 'Andreas', 'Georgios', 'Konstantinos', 'Christos', 'Nikolaos', 'Michalis', 'Panagiotis', 'Ioannis', 'Marios', 'Dimitrios', 'Jakub', 'Jan', 'Tomas', 'David', 'Adam', 'Matyas', 'Filip', 'Vojtěch', 'Ondřej', 'Lukas', 'William', 'Noah', 'Oscar', 'Lucas', 'Victor', 'Malthe', 'Oliver', 'Alfred', 'Carl', 'Valdemar', 'Oliver', 'George', 'Harry', 'Jack', 'Jacob', 'Noah', 'Charlie', 'Muhammad', 'Thomas', 'Oscar', 'Aleksandr', 'Vladimir', 'Sergei', 'Andrei', 'Aleksei', 'Martin', 'Andres', 'Dmitri', 'Igor', 'Toomas', 'Benjamin', 'Liam', 'Rokur', 'Aron', 'Brandur', 'Friði', 'Kristian', 'Noa', 'David', 'Elias', 'Filip', 'Mattias', 'Leo', 'Elias', 'Oliver', 'Eino', 'Väino', 'Eeli', 'Noel', 'Leevi', 'Onni', 'Hugo', 'Emil', 'Liam', 'William', 'Oliver', 'Edvin', 'Max', 'Hugo', 'Benjamin', 'Elias', 'Leo', 'Gabriel', 'Louis', 'Raphaël', 'Jules', 'Adam', 'Lucas', 'Leo', 'Hugo', 'Arthur', 'Nathan', 'Giorgi', 'Nikoloz', 'Andria', 'Gabrieli', 'Luka', 'Saba', 'Davit', 'Aleksandre', 'Ben', 'Jonas', 'Leon', 'Elias', 'Finn', 'Fynn', 'Noah', 'Paul', 'Luis', 'Louis', 'Lukas', 'Lucas', 'Luca', 'Luka', 'Georgios', 'Ioannis', 'Konstantinos', 'Dimitrios', 'Nikolaos', 'Panagiotis', 'Vasileios', 'Christos', 'Athanasios', 'Michail', 'Charlie', 'Harry', 'William', 'Alexander', 'Lewis', 'Charles', 'Bence', 'Mate', 'Levente', 'Adam', 'David', 'Daniel', 'Marcell', 'Balazs', 'Milan', 'Dominik', 'Aron', 'Alexander', 'Viktor', 'Victor', 'Kristjan', 'Kristian', 'Christian', 'Jon', 'Guðmundur', 'Kristofer', 'Gunnar', 'Olafur', 'Olav', 'Benedikt', 'Dagur', 'Emil', 'Jack', 'James', 'Daniel', 'Conor', 'Sean', 'Adam', 'Noah', 'Michael', 'Charlie', 'Luke', 'James', 'Jamie', 'Joshua', 'Harry', 'Harrison', 'Connor', 'Jackson', 'Alfie', 'Alfred', 'Lucas', 'Luke', 'Benjamin', 'Thomas', 'Charles', 'Jake', 'William', 'Daniel', 'Lee', 'Theo', 'Leonardo', 'Francesco', 'Alessandro', 'Lorenzo', 'Mattia', 'Andrea', 'Gabriele', 'Riccardo', 'Tommaso', 'Edoardo', 'Roberts', 'Markuss', 'Artjoms', 'Ralfs', 'Gustavs', 'Maksims', 'Arturs', 'Aleksandrs', 'Emils', 'Daniels', 'Benjamin', 'Elias', 'Raphael', 'Rafael', 'Jonas', 'Paul', 'David', 'Liam', 'Robin', 'Lukas', 'Matas', 'Nojus', 'Dominykas', 'Jokubas', 'Emilis', 'Jonas', 'Kajus', 'Gabrielius', 'Dovydas', 'Gabriel', 'Leo', 'Luca', 'Noah', 'David', 'Tom', 'Ben', 'Aleksandar', 'Zoran', 'Nikola', 'Goran', 'Dragan', 'Dejan', 'Petar', 'Igor', 'Ilija', 'Stefan', 'Mihail', 'Damjan', 'Petar', 'Marko', 'Andrej', 'David', 'Jovan', 'Luka', 'Matej', 'Stefan', 'Luke', 'Luca', 'Lucas', 'Matthew', 'Matthias', 'Matteo', 'Jacob', 'Jake', 'Zachary', 'Zak', 'Zack', 'Michael', 'Miguel', 'Mikhail', 'Liam', 'William', 'John', 'Jean', 'Jonathan', 'Juan', 'Gan', 'Benjamin', 'Ben', 'Kaiden', 'Kayden', 'Kai', 'Alexander', 'Alessandro', 'Alec', 'Andrew', 'Andreas', 'Andre', 'Andy', 'David', 'Maxim', 'Alexandru', 'Artiom', 'Ion', 'Bogdan', 'Daniel', 'Matthew', 'Nikita', 'Michael', 'Gabriel', 'Alexandre', 'Lucas', 'Ethan', 'Aaron', 'Nikola', 'Marko', 'Dragan', 'Milos', 'Zoran', 'Milan', 'Aleksandar', 'Ivan', 'Petar', 'Luka', 'Luka', 'Vuk', 'Lazar', 'Pavle', 'Vasilije', 'Petar', 'Stefan', 'Jovan', 'Andrej', 'David', 'Daan', 'Noah', 'Sem', 'Lucas', 'Jesse', 'Finn', 'Milan', 'Max', 'Levi', 'Luuk', 'James', 'Jack', 'Noah', 'Charlie', 'Daniel', 'Oliver', 'Matthew', 'Harry', 'Thomas', 'Jake', 'William', 'Oskar', 'Lucas', 'Mathias', 'Filip', 'Oliver', 'Jakob', 'Jacob', 'Emil', 'Noah', 'Aksel', 'Antoni', 'Jakub', 'Jan', 'Szymon', 'Aleksander', 'Franciszek', 'Filip', 'Mikołaj', 'Wojciech', 'Kacper', 'João', 'Martim', 'Rodrigo', 'Santiago', 'Francisco', 'Afonso', 'Tomas', 'Miguel', 'Guilherme', 'Gabriel', 'Andrei', 'David', 'Alexandru', 'Gabriel', 'Mihai', 'Cristian', 'Stefan', 'Luca', 'Ionut', 'Darius', 'Alexander', 'Maxim', 'Artyom', 'Artem', 'Mikhail', 'Daniil', 'Danila', 'Danil', 'Ivan', 'Dmitry', 'Kirill', 'Andrey', 'Yegor', 'Alexander', 'Sergei', 'Dmitry', 'Andrei', 'Alexey', 'Maxim', 'Evgeny', 'Ivan', 'Mikhail', 'Artyom', 'Jack', 'James', 'Oliver', 'Lewis', 'Logan', 'Harry', 'Noah', 'Leo', 'Charlie', 'Alexander', 'Dragan', 'Milan', 'Aleksandar', 'Zoran', 'Nikola', 'Milos', 'Marko', 'Goran', 'Dusan', 'Dejan', 'Nikola', 'Luka', 'Stefan', 'Marko', 'Lazar', 'Aleksandar', 'Filip', 'Jovan', 'Nemanja', 'Milos', 'Jakub', 'Adam', 'Samuel', 'Lukas', 'Martin', 'Tomas', 'Michal', 'Filip', 'Matej', 'Matus', 'Luka', 'Jakob', 'Mark', 'Filip', 'Nik', 'Tim', 'Jaka', 'Zan', 'Jan', 'Lovro', 'Hugo', 'Daniel', 'Martin', 'Pablo', 'Alejandro', 'Lucas', 'Alvaro', 'Adrian', 'Mateo', 'David', 'Markel', 'Aimar', 'Jon', 'Ibai', 'Julen', 'Ander', 'Unax', 'Oier', 'Mikel', 'Iker', 'Marc', 'Àlex', 'Marti', 'Hugo', 'Biel', 'Èric', 'Nil', 'Jan', 'Pol', 'Pau', 'Oscar', 'Lucas', 'William', 'Liam', 'Oliver', 'Hugo', 'Alexander', 'Elias', 'Charlie', 'Noah', 'Noah', 'Liam', 'Gabriel', 'Luca', 'Leon', 'Elias', 'David', 'Samuel', 'Louis', 'Julian', 'Artem', 'Matviy', 'Maksym', 'David', 'Nikita', 'Mykyta', 'Mykhailo', 'Daniil', 'Danylo', 'Bohdan', 'Andriy', 'Oleksandr', 'Oliver', 'Jacob', 'Noah', 'Jack', 'Oscar', 'Harry', 'Charlie', 'Alfie', 'George', 'William']
     europeNames["fem"] = ['Amelia', 'Ajla', 'Melisa', 'Amelija', 'Klea', 'Sara', 'Kejsi', 'Noemi', 'Alesia', 'Leandra', 'Laia', 'Carlota', 'Emma', 'Lara', 'Martina', 'Aina', 'Maria', 'Blanca', 'Laura', 'Valentina', 'Anna', 'Hannah', 'Sophia', 'Emma', 'Marie', 'Lena', 'Sarah', 'Sophie', 'Laura', 'Mia', 'Sofiya', 'Marya', 'Polina', 'Eva', 'Anna', 'Darya', 'Kseniya', 'Alisa', 'Emma', 'Louise', 'Olivia', 'Elise', 'Alice', 'Juliette', 'Mila', 'Lucie', 'Marie', 'Camille', 'Maria', 'Marie', 'Dominique', 'Martine', 'Nathalie', 'Anne', 'Rita', 'Nicole', 'Anna', 'Christiane', 'Emma', 'Marie', 'Elise', 'Julie', 'Louise', 'Noor', 'Lotte', 'Fien', 'Nina', 'Ella', 'Lore', 'Lea', 'Lucie', 'Emma', 'Zoe', 'Louise', 'Camille', 'Manon', 'Chloe', 'Alice', 'Clara', 'Aya', 'Yasmine', 'Lina', 'Sara', 'Sarah', 'Sofia', 'Louise', 'Nour', 'Lea', 'Malak', 'Amina', 'Merjem', 'Sara', 'Asja', 'Lamija', 'Ema', 'Emina', 'Hana', 'Lejla', 'Esma', 'Marija', 'Sofija', 'Ana', 'Milica', 'Sara', 'Dunja', 'Teodora', 'Anastasija', 'Andela', 'Katarina', 'Viktoria', 'Maria', 'Nikol', 'Aleksandra', 'Gabriela', 'Daria', 'Raya', 'Yoana', 'Sofia', 'Simona', 'Mia', 'Lucija', 'Sara', 'Ana', 'Ema', 'Petra', 'Lana', 'Nika', 'Marta', 'Elena', 'Maria', 'Eleni', 'Androula', 'Georgia', 'Panagiota', 'Anna', 'Christina', 'Katerina', 'Ioanna', 'Kyriaki', 'Eliska', 'Tereza', 'Anna', 'Adela', 'Natalie', 'Sofie', 'Kristýna', 'Karolina', 'Viktorie', 'Barbora', 'Ida', 'Emma', 'Alma', 'Ella', 'Sofia', 'Freja', 'Josefine', 'Clara', 'Anna', 'Karla', 'Olivia', 'Amelia', 'Emily', 'Isla', 'Ava', 'Jessica', 'Isabella', 'Lily', 'Ella', 'Mia', 'Olga', 'Irina', 'Jelena', 'Tatjana', 'Svetlana', 'Valentina', 'Anna', 'Galina', 'Natalja', 'Maria', 'Eva', 'Emma', 'Hanna', 'Maria', 'Ro', 'Elsa', 'Lea', 'Sofia', 'Isabella', 'Lilja', 'Liva', 'Mia', 'Ronja', 'Rosa', 'Aino', 'Aada', 'Sofia', 'Eevi', 'Olivia', 'Lilja', 'Helmi', 'Ellen', 'Emilia', 'Ella', 'Saga', 'Emma', 'Stella', 'Ellen', 'Alva', 'Ebba', 'Olivia', 'Selma', 'Alma', 'Ella', 'Emma', 'Louise', 'Jade', 'Alice', 'Chloe', 'Lina', 'Mila', 'Lea', 'Manon', 'Rose', 'Mariami', 'Barbare', 'Elene', 'Anastasia', 'Nino', 'Nia', 'Ana', 'Elizaveta', 'Mia', 'Emma', 'Hannah', 'Hanna', 'Sofia', 'Sophia', 'Anna', 'Emilia', 'Lina', 'Marie', 'Lena', 'Mila', 'Maria', 'Eleni', 'Aikaterini', 'Vasiliki', 'Basiliki', 'Sophia', 'Angeliki', 'Georgia', 'Dimitra', 'Konstantina', 'Paraskevi', 'Paraskeui', 'Chloe', 'Olivia', 'Daisy', 'Isla', 'Jessica', 'Hanna', 'Anna', 'Jazmin', 'Lili', 'Zsofia', 'Emma', 'Luca', 'Boglarka', 'Zoe', 'Nora', 'Margret', 'Margrjet', 'Margret', 'Anna', 'Emma', 'Isabella', 'Isabel', 'Isabella', 'Isabel', 'Eva', 'Hekla', 'Kristin', 'Viktoria', 'Emilia', 'Emelia', 'Katrin', 'Emily', 'Emma', 'Ava', 'Sophie', 'Amelia', 'Ella', 'Lucy', 'Grace', 'Chloe', 'Mia', 'Isabella', 'Eva', 'Evie', 'Lilly', 'Sofia', 'Amelia', 'Emma', 'Olivia', 'Abbie', 'Chloe', 'Holly', 'Grace', 'Maisie', 'Mia', 'Sienna', 'Sofia', 'Giulia', 'Aurora', 'Alice', 'Ginevra', 'Emma', 'Giorgia', 'Greta', 'Beatrice', 'Anna', 'Sofija', 'Emilija', 'Alise', 'Anna', 'Marta', 'Viktorija', 'Elizabete', 'Estere', 'Anastasija', 'Paula', 'Anna', 'Noemi', 'Emilija', 'Austeja', 'Vilte', 'Gabija', 'Liepa', 'Kamile', 'Leja', 'Ugne', 'Ema', 'Urte', 'Emma', 'Lara', 'Zoe', 'Amy', 'Sarah', 'Charlotte', 'Emily', 'Marija', 'Elena', 'Biljana', 'Vesna', 'Snezana', 'Violeta', 'Aleksandra', 'Suzana', 'Katerina', 'Ivana', 'Sara', 'Jana', 'Jovana', 'Sofija', 'Ana', 'Mila', 'Marija', 'Eva', 'Anastasija', 'Ilina', 'Elena', 'Elenia', 'Helena', 'Ella', 'Julia', 'Yulia', 'Julianne', 'Emma', 'Emmanuela', 'Ema', 'Eliza', 'Elisa', 'Elizabeth', 'Elise', 'Catherine', 'Katrina', 'Kate', 'Katya', 'Maya', 'Mia', 'Myah', 'Lea', 'Leah', 'Leia', 'Emilia', 'Emily', 'Emelie', 'Amy', 'Aimee', 'Maria', 'Marija', 'Mariah', 'Marie', 'Anna', 'Hannah', 'Ann', 'Sofia', 'Anastasia', 'Daria', 'Victoria', 'Alexandra', 'Evelina', 'Amelia', 'Andreea', 'Valeria', 'Gabriela', 'Victoria', 'Giulia', 'Chloe', 'Emma', 'Anna', 'Jelena', 'Milica', 'Marija', 'Ivana', 'Milena', 'Ana', 'Dragana', 'Radmila', 'Vesna', 'Ljiljana', 'Sofija', 'Sara', 'Masa', 'Dunja', 'Jana', 'Teodora', 'Jovana', 'Helena', 'Anja', 'Hana', 'Anna', 'Emma', 'Tess', 'Sophie', 'Julia', 'Zoë', 'Evi', 'Mila', 'Sara', 'Eva', 'Fenna', 'Lotte', 'Emily', 'Ella', 'Grace', 'Sophie', 'Olivia', 'Anna', 'Amelia', 'Aoife', 'Lucy', 'Ava', 'Nora', 'Emma', 'Sara', 'Sofie', 'Sofia', 'Maja', 'Olivia', 'Ella', 'Ingrid', 'Emilie', 'Zuzanna', 'Julia', 'Lena', 'Maja', 'Hanna', 'Zofia', 'Amelia', 'Alicja', 'Aleksandra', 'Natalia', 'Maria', 'Leonor', 'Matilde', 'Beatriz', 'Carolina', 'Mariana', 'Ana', 'Inês', 'Margarida', 'Sofia', 'Maria', 'Elena', 'Ioana', 'Andreea', 'Sofia', 'Alexandra', 'Antonia', 'Daria', 'Ana', 'Gabriela', 'Sofiya', 'Sofya', 'Mariya', 'Marya', 'Anna', 'Anastasiya', 'Viktoriya', 'Yelizaveta', 'Polina', 'Alisa', 'Darya', 'Dariya', 'Alexandra', 'Anastasia', 'Yelena', 'Olga', 'Natalia', 'Yekaterina', 'Anna', 'Tatiana', 'Maria', 'Irina', 'Yulia', 'Olivia', 'Emily', 'Sophie', 'Isla', 'Ava', 'Amelia', 'Jessica', 'Ella', 'Lucy', 'Charlotte', 'Milica', 'Jelena', 'Marija', 'Mirjana', 'Dragana', 'Snezana', 'Ljiljana', 'Ivana', 'Ana', 'Gordana', 'Milica', 'Andela', 'Jovana', 'Ana', 'Teodora', 'Katarina', 'Marija', 'Sara', 'Anastasija', 'Aleksandra', 'Sofia', 'Nina', 'Natalia', 'Nela', 'Viktoria', 'Ema', 'Laura', 'Michaela', 'Kristina', 'Simona', 'Zala', 'Eva', 'Ema', 'Lara', 'Sara', 'Masa', 'Mia', 'Ana', 'Neza', 'Zoja', 'Lucia', 'Martina', 'Maria', 'Sofia', 'Paula', 'Daniela', 'Valeria', 'Alba', 'Julia', 'Noa', 'Ane', 'June', 'Nahia', 'Irati', 'Laia', 'Nora', 'Izaro', 'Lucia', 'Malen', 'Uxue', 'Martina', 'Julia', 'Laia', 'Lucia', 'Maria', 'Emma', 'Aina', 'Paula', 'Noa', 'Carla', 'Alice', 'Lilly', 'Maja', 'Elsa', 'Ella', 'Alicia', 'Olivia', 'Julia', 'Ebba', 'Wilma', 'Mia', 'Emma', 'Elena', 'Sofia', 'Lena', 'Emilia', 'Lara', 'Anna', 'Laura', 'Mila', 'Sofiya', 'Anastasiya', 'Anna', 'Hanna', 'Mariya', 'Alisa', 'Viktoriya', 'Veronika', 'Polina', 'Luna', 'Olivia', 'Amelia', 'Ella', 'Ava', 'Isla', 'Emily', 'Evie', 'Mia', 'Lily', 'Isabelle']
     europeNames["neut"] = ['Aderyn', 'Aednat', 'Aemilia', 'Aeron', 'Aeschere', 'Aeslin', 'Afallon', 'Aiko', 'Aislin', 'Angus', 'Ashley', 'Avery', 'Awen', 'Bairn', 'Beagan', 'Blaine', 'Blair', 'Briar', 'Bryn', 'Cailean', 'Cameron', 'Carlyn', 'Carol', 'Clair', 'Coney', 'Cory', 'Cymbaline', 'Daire', 'Dove', 'Dylan', 'Earley', 'Eldhrimnir', 'Endewyn', 'Esprit', 'Evelyn', 'Fannar', 'Greer', 'Gwyneira', 'Harden', 'Harley', 'Hayden', 'Heidrun', 'Ivo', 'Kai', 'Kieran', 'Korrigan', 'Lumi', 'Murtagh', 'Neave', 'Nevada', 'Orla', 'Osier', 'Paris', 'Quince', 'Raleigh', 'Rana', 'Robin', 'Also', 'Rowan', 'Ruari', 'Rue', 'Ryan', 'Savin', 'Savine', 'Seanan', 'Seren', 'Shannon', 'Solana', 'Starling', 'Suvi', 'Teagan', 'Thorley', 'Tyler', 'Vail', 'Vale', 'Vernal', 'Vyri', 'Wynnfrith', 'Yvonne', 'Zenon']
-    europeNames["sur"] = ['Gruber', 'Huber', 'Bauer', 'Wagner', 'Muller', 'Pichler', 'Steiner', 'Moser', 'Mayer', 'Azerbaijan', 'Quliyev', 'Abdullayev', 'Abbasov', 'Belgium', 'January', 'December', 'Dubois', 'Lambert', 'Dupont', 'Martin', 'Simon', 'Bosnia', 'Hodzic', 'Hadzic', 'Cengic', 'Delic', 'Demirovic', 'Kovacevic', 'Tahirovic', 'Ferhatovic', 'Muratovic', 'Ibrahimovic', 'Hasanovic', 'Mehmedovic', 'Salihovic', 'Terzic', 'Ademovic', 'Adilovic', 'Delemovic', 'Zukic', 'Krlicevic', 'Suljic', 'Ahmetovic', 'Kovacevic', 'Subotic', 'Savic', 'Popovic', 'Jovanovic', 'Petrovic', 'Duric', 'Babic', 'Lukic', 'Knezevic', 'Markovic', 'Ilic', 'Dukic', 'Vukovic', 'Vujic', 'Simic', 'Radic', 'Nikolic', 'Maric', 'Mitrovic', 'Tomic', 'Bozic', 'Golubovic', 'Mirkovic', 'Croatia', 'Horvat', 'Kovacevic', 'Babic', 'Maric', 'Juric', 'Novak', 'Kovacic', 'Knezevic', 'Vukovic', 'Markovic', 'Petrovic', 'Matic', 'Tomic', 'Pavlovic', 'Kovac', 'Bozic', 'Blazevic', 'Grgic', 'Pavic', 'Radic', 'Peric', 'Filipovic', 'Saric', 'Lovric', 'Vidovic', 'Perkovic', 'Popovic', 'Bosnjak', 'Jukic', 'Barisic', 'Denmark', 'January', 'Nielsen', 'Jensen', 'Hansen', 'Pedersen', 'Andersen', 'Christensen', 'Larsen', 'Sorensen', 'Rasmussen', 'Estonia', 'Tamm', 'Saar', 'Sepp', 'Mägi', 'Kask', 'Kukk', 'Rebane', 'Ilves', 'Pärn', 'Koppel', 'Ivanov', 'Smirnov', 'Vassiljev', 'Petrov', 'Kuznetsov', 'Mihhailov', 'Pavlov', 'Semjonov', 'Andrejev', 'Aleksejev', 'Most', 'Joensen', 'Hansen', 'Jacobsen', 'Olsen', 'Petersen', 'Poulsen', 'Johannesen', 'Thomsen', 'Nielsen', 'Finland', 'Korhonen', 'Virtanen', 'Mäkinen', 'Nieminen', 'Mäkelä', 'Hämäläinen', 'Laine', 'Heikkinen', 'Koskinen', 'Most', 'Johansson', 'Nyman', 'Lindholm', 'Karlsson', 'Andersson', 'France', 'Martin', 'Bernard', 'Dubois', 'Thomas', 'Robert', 'Richard', 'Petit', 'Durand', 'Leroy', 'Moreau', 'Simon', 'Laurent', 'Lefebvre', 'Michel', 'Garcia', 'David', 'Bertrand', 'Roux', 'Vincent', 'Fournier', 'Morel', 'Girard', 'Andre', 'Lefèvre', 'Mercier', 'Dupont', 'Lambert', 'Bonnet', 'Francois', 'Martinez', 'Muller', 'Schmidt', 'Schneider', 'Fischer', 'Meyer', 'Weber', 'Wagner', 'Schulz', 'Becker', 'Nagy', 'Kovacs', 'Toth', 'Szabo', 'Horvath', 'Varga', 'Kiss', 'Molnar', 'Nemeth', 'Farkas', 'Balogh', 'Papp', 'Lakatos', 'Takacs', 'Juhasz', 'Meszaros', 'Olah', 'Simon', 'Racz', 'Fekete', 'Szilagyi', 'Torok', 'Feher', 'Balazs', 'Gal', 'Most', 'Blondal', 'Thorarensen', 'Hansen', 'Olsen', 'Andersen', 'Petersen', 'Moller', 'Nielsen', 'Waage', 'Fjeldsted', 'Norðdahl', 'Ireland', 'Murphy', 'Walsh', 'Smith', 'Doyle', 'Mccarthy', 'Kennedy', 'Lynch', 'Murray', 'Rossi', 'Red', 'Russo', 'Ferrari', 'Blacksmith', 'Esposito', 'Exposed', 'Bianchi', 'White', 'Romano', 'Roman', 'Colombo', 'Dove', 'Bruno', 'Brown', 'Ricci', 'Curly', 'Greco', 'Greek', 'Marino', 'Gallo', 'Rooster', 'Conti', 'Count', 'Costa', 'Coast', 'Mancini', 'Left', 'Giordano', 'Jordan', 'Rizzo', 'Curly', 'Lombardi', 'Lombard', 'Barbieri', 'Barber', 'Moretti', 'Brown', 'Fontana', 'Fountain', 'Caruso', 'Mariani', 'Marian', 'Ferrara', 'Blacksmith', 'Santoro', 'Sanctorum', 'Rinaldi', 'Reynold', 'Leone', 'Lion', 'Longo', 'Long', 'Galli', 'Roosters', 'Martini', 'Martin', 'Martinelli', 'Martin', 'Serra', 'Saw', 'Conte', 'Count', 'Vitale', 'Vitale', 'Marchetti', 'Messina', 'Messina', 'Gentile', 'Gentle', 'Villa', 'Marini', 'Lombardo', 'Lombard', 'Coppola', 'Ferri', 'Parisi', 'Bianco', 'White', 'Amato', 'Beloved', 'Fabbri', 'Blacksmith', 'Gatti', 'Cats', 'Sala', 'Sala', 'Morelli', 'Grasso', 'Fat', 'Pellegrini', 'Pilgrims', 'Ferraro', 'Blacksmith', 'Monti', 'Mountains', 'Palumbo', 'Pigeon', 'Grassi', 'Fat', 'Testa', 'Head', 'Valentini', 'Carbone', 'Coal', 'Benedetti', 'Silvestri', 'Farina', 'Flour', 'Martino', 'Martin', 'Bernardi', 'Barnard', 'Caputo', 'Big', 'Mazza', 'Sanna', 'Fang', 'Fiore', 'Flower', 'Pellegrino', 'Pilgrim', 'Giuliani', 'Rizzi', 'Curly', 'Di', 'Cattaneo', 'Captain', 'Rossetti', 'Orlando', 'Basile', 'Basil', 'Neri', 'Black', 'Barone', 'Baron', 'Palmieri', 'Palmer', 'Riva', 'Shore', 'Romeo', 'Franco', 'Frank', 'Sorrentino', 'Pagano', 'Pagan', 'Piras', 'Pear', 'Ruggiero', 'Rodger', 'Montanari', 'Highlander', 'Battaglia', 'Fight', 'Bellini', 'Castelli', 'Castles', 'Guerra', 'War', 'Poli', 'Valente', 'Ferretti', 'Krasniqi', 'Gashi', 'Berisha', 'Morina', 'Shala', 'Bytyqi', 'Hasani', 'Kastrati', 'Kryeziu', 'Latvia', 'Berzins', 'Kalnins', 'Ozolins', 'Jansons', 'Ozols', 'Liepins', 'Krumins', 'Balodis', 'Eglitis', 'Zarins', 'Petersons', 'Vitols', 'Klavins', 'Karklins', 'Vanags', 'Kazlauskas', 'Jankauskas', 'Petrauskas', 'Stankevicius', 'Vasiliauskas', 'Butkus', 'Zukauskas', 'Paulauskas', 'Urbonas', 'Kavaliauskas', 'Entries', 'Borg', 'Camilleri', 'Vella', 'Farrugia', 'Zammit', 'Galea', 'Micallef', 'Grech', 'Attard', 'Spiteri', 'Rusu', 'Ceban', 'Ciobanu', 'Turcan', 'Cebotari', 'Sîrbu', 'Lungu', 'Munteanu', 'Rotari', 'Montenegro', 'Popovic', 'Markovic', 'Vujovic', 'Radovic', 'Ivanovic', 'Radulovic', 'Jovanovic', 'Perovic', 'Vukovic', 'Kovacevic', 'County', 'Percent', 'English', 'Jansen', 'Johnson', 'Van', 'Van', 'Bakker', 'Baker', 'Janssen', 'Johnson', 'Visser', 'Fisher', 'Smit', 'Smith', 'Mayor', 'Mulder', 'Miller', 'Bos', 'Bush', 'Vos', 'Fox', 'Peters', 'Peters', 'Hendriks', 'Henderson', 'Van', 'Dekker', 'Thatcher', 'Brouwer', 'Brewer', 'Dijkstra', 'Smits', 'Smith', 'Van', 'Vd', 'Van', 'Van', 'Andov', 'Angelov', 'Bogdanov', 'Bozinov', 'Brankov', 'Damcevski', 'Davidov', 'Dimitrov', 'Donev', 'Filipov', 'Georgiev', 'Ivanov', 'Ivanovski', 'Janev', 'Kitanovski', 'Koloski', 'Kostovski', 'Kostov', 'Manasievski', 'Markov', 'Markovski', 'Markoski', 'Matovski', 'Mladenovski', 'Nikolovski', 'Pavlovski', 'Penov', 'Petkov', 'Petrevski', 'Petrovski', 'Popoff', 'Popovski', 'Ristevski', 'Stojanov', 'Trajanoski', 'Trajanovski', 'Trajcevski', 'Trajkovski', 'Hansen', 'Johansen', 'Olsen', 'Larsen', 'Andersen', 'Pedersen', 'Nilsen', 'Kristiansen', 'Jensen', 'Karlsen', 'Johnsen', 'Pettersen', 'Eriksen', 'Berg', 'Haugen', 'Hagen', 'Johannessen', 'Andreassen', 'Jacobsen', 'Dahl', 'Jorgensen', 'Halvorsen', 'Henriksen', 'Lund', 'Nowak', 'Kowalski', 'Wisniewski', 'Wojcik', 'Kowalczyk', 'Kaminski', 'Lewandowski', 'Zielinski', 'Szymanski', 'Polish', 'Most', 'Silva', 'Santos', 'Ferreira', 'Pereira', 'Oliveira', 'Costa', 'Rodrigues', 'Martins', 'Jesus', 'Sousa', 'Fernandes', 'Goncalves', 'Gomes', 'Lopes', 'Marques', 'Alves', 'Almeida', 'Ribeiro', 'Pinto', 'Carvalho', 'Teixeira', 'Moreira', 'Correia', 'Mendes', 'Nunes', 'Soares', 'Vieira', 'Monteiro', 'Cardoso', 'Rocha', 'Neves', 'Coelho', 'Cruz', 'Cunha', 'Pires', 'Duarte', 'Reis', 'Simões', 'Antunes', 'Matos', 'Fonseca', 'Machado', 'Araujo', 'Barbosa', 'Tavares', 'Lourenco', 'Castro', 'Figueiredo', 'Azevedo', 'Freitas', 'Popa', 'Popescu', 'Pop', 'Radu', 'Dumitru', 'Stan', 'Stoica', 'Gheorghe', 'Matei', 'Ciobanu', 'Ionescu', 'Rusu', 'Most', 'Those', 'Jovanovic', 'Petrovic', 'Nikolic', 'Markovic', 'Dordevic', 'Stojanovic', 'Ilic', 'Stankovic', 'Pavlovic', 'Milosevic', 'Horvath', 'Kovac', 'Varga', 'Toth', 'Nagy', 'Balaz', 'Szabo', 'Molnar', 'Balog', 'Lukac', 'Novak', 'Kovacs', 'Polak', 'Gajdos', 'Kollar', 'Hudak', 'Nemeth', 'Kovacik', 'Olah', 'Oravec', 'Hungarians', 'Novak', 'Horvat', 'Kovacic', 'Krajnc', 'Zupancic', 'Potocnik', 'Kovac', 'Mlakar', 'Kos', 'Vidmar', 'Golob', 'Turk', 'Bozic', 'Kralj', 'Korosec', 'Zupan', 'Bizjak', 'Hribar', 'Kotnik', 'Kavcic', 'Rozman', 'Kastelic', 'Oblak', 'Zagar', 'Petek', 'Hocevar', 'Kolar', 'Kosir', 'Koren', 'Klemencic', 'Garcia', 'Fernandez', 'Gonzalez', 'Rodriguez', 'Lopez', 'Martinez', 'Sanchez', 'Perez', 'Martin', 'Gomez', 'Ruiz', 'Hernandez', 'Jimenez', 'Diaz', 'Alvarez', 'Moreno', 'Munoz', 'Alonso', 'Variation', 'Gutierrez', 'Romero', 'Pilgrim', 'Navarro', 'Torres', 'Dominguez', 'Gil', 'Vazquez', 'Serrano', 'Highlander', 'Ramos', 'Blanco', 'White', 'Sanz', 'Castro', 'Suarez', 'Ortega', 'Rubio', 'Molina', 'Delgado', 'Skinny', 'Ramirez', 'Morales', 'Blackberry', 'Ortiz', 'Marin', 'Latin', 'Iglesias', 'Churches', 'Data', 'Gonzalez', 'Rodriguez', 'Hernandez', 'Perez', 'Garcia', 'Martin', 'Santana', 'Diaz', 'Suarez', 'Sweden', 'Andersson', 'Johansson', 'Karlsson', 'Nilsson', 'Eriksson', 'Larsson', 'Olsson', 'Persson', 'Svensson', 'Gustafsson', 'Pettersson', 'Jonsson', 'Jansson', 'Hansson', 'Bengtsson', 'Jonsson', 'Lindberg', 'Jakobsson', 'Magnusson', 'Olofsson', 'Andersson', 'Johansson', 'Nilsson', 'Larsson', 'Persson', 'Blind', 'Jonsson', 'Eriksson', 'Nutti', 'Labba', 'Bianchi', 'Bernasconi', 'Fontana', 'Crivelli', 'Galli', 'Cereghetti', 'Colombo', 'Rossi', 'Ferrari', 'Cavadini', 'Sante', 'Ravelli', 'Giovanni', 'Piero', 'Muller', 'Meier', 'Schmid', 'Keller', 'Weber', 'Huber', 'Meyer', 'Schneider', 'Steiner', 'Fischer', 'Brunner', 'Baumann', 'Gerber', 'Frei', 'Moser', 'Yılmaz', 'Kaya', 'Demir', 'Sahin', 'Celik', 'Yıldız', 'Yıldırım', 'Ozturk', 'Aydın', 'Ozdemir', 'Arslan', 'Dogan', 'Kılıc', 'Aslan', 'Khan', 'Kara', 'Koc', 'Kurt', 'Ozkan', 'Simsek', 'Melnyk', 'Shevchenko', 'Boyko', 'Kovalenko', 'Bondarenko', 'Tkachenko', 'Kovalchuk', 'Kravchenko', 'Oliynyk', 'Shevchuk', 'Koval', 'Polishchuk', 'Bondar', 'Tkachuk', 'Moroz', 'Marchenko', 'Lysenko', 'Rudenko', 'Savchenko', 'Petrenko', 'Smith', 'Jones', 'Taylor', 'Brown', 'Williams', 'Wilson', 'Johnson', 'Davies', 'Robinson', 'Greater', 'Brown', 'Smith', 'Patel', 'Jones', 'Williams', 'Johnson', 'Taylor', 'Thomas', 'Roberts', 'Khan', 'Lewis', 'Jackson', 'Clarke', 'James', 'Phillips', 'Wilson', 'Ali', 'Mason', 'Mitchell', 'Rose', 'Davis', 'Davies', 'Rodriguez', 'Cox', 'Alexander', 'Wilson', 'Campbell', 'Kelly', 'Johnston', 'Moore', 'Thompson', 'Smyth', 'Brown', 'Scotland', 'Smith', 'Brown', 'Wilson', 'Robertson', 'Thomson', 'Campbell', 'Stewart', 'Anderson', 'Scott', 'Wales', 'Jones', 'Williams', 'Davies', 'Evans', 'Thomas', 'Roberts', 'Lewis', 'Hughes', 'Morgan']
+    europeNames["sur"] = ['Gruber', 'Huber', 'Bauer', 'Wagner', 'Muller', 'Pichler', 'Steiner', 'Moser', 'Mayer', 'Azerbaijan', 'Quliyev', 'Abdullayev', 'Abbasov', 'Belgium', 'January', 'December', 'Dubois', 'Lambert', 'Dupont', 'Martin', 'Simon', 'Bosnia', 'Hodzic', 'Hadzic', 'Cengic', 'Delic', 'Demirovic', 'Kovacevic', 'Tahirovic', 'Ferhatovic', 'Muratovic', 'Ibrahimovic', 'Hasanovic', 'Mehmedovic', 'Salihovic', 'Terzic', 'Ademovic', 'Adilovic', 'Delemovic', 'Zukic', 'Krlicevic', 'Suljic', 'Ahmetovic', 'Kovacevic', 'Subotic', 'Savic', 'Popovic', 'Jovanovic', 'Petrovic', 'Duric', 'Babic', 'Lukic', 'Knezevic', 'Markovic', 'Ilic', 'Dukic', 'Vukovic', 'Vujic', 'Simic', 'Radic', 'Nikolic', 'Maric', 'Mitrovic', 'Tomic', 'Bozic', 'Golubovic', 'Mirkovic', 'Croatia', 'Horvat', 'Kovacevic', 'Babic', 'Maric', 'Juric', 'Novak', 'Kovacic', 'Knezevic', 'Vukovic', 'Markovic', 'Petrovic', 'Matic', 'Tomic', 'Pavlovic', 'Kovac', 'Bozic', 'Blazevic', 'Grgic', 'Pavic', 'Radic', 'Peric', 'Filipovic', 'Saric', 'Lovric', 'Vidovic', 'Perkovic', 'Popovic', 'Bosnjak', 'Jukic', 'Barisic', 'Denmark', 'January', 'Nielsen', 'Jensen', 'Hansen', 'Pedersen', 'Andersen', 'Christensen', 'Larsen', 'Sorensen', 'Rasmussen', 'Estonia', 'Tamm', 'Saar', 'Sepp', 'Mägi', 'Kask', 'Kukk', 'Rebane', 'Ilves', 'Pärn', 'Koppel', 'Ivanov', 'Smirnov', 'Vassiljev', 'Petrov', 'Kuznetsov', 'Mihhailov', 'Pavlov', 'Semjonov', 'Andrejev', 'Aleksejev', 'Most', 'Joensen', 'Hansen', 'Jacobsen', 'Olsen', 'Petersen', 'Poulsen', 'Johannesen', 'Thomsen', 'Nielsen', 'Finland', 'Korhonen', 'Virtanen', 'Mäkinen', 'Nieminen', 'Mäkelä', 'Hämäläinen', 'Laine', 'Heikkinen', 'Koskinen', 'Most', 'Johansson', 'Nyman', 'Lindholm', 'Karlsson', 'Andersson', 'France', 'Martin', 'Bernard', 'Dubois', 'Thomas', 'Robert', 'Richard', 'Petit', 'Durand', 'Leroy', 'Moreau', 'Simon', 'Laurent', 'Lefebvre', 'Michel', 'Garcia', 'David', 'Bertrand', 'Roux', 'Vincent', 'Fournier', 'Morel', 'Girard', 'Andre', 'Lefèvre', 'Mercier', 'Dupont', 'Lambert', 'Bonnet', 'Francois', 'Martinez', 'Muller', 'Schmidt', 'Schneider', 'Fischer', 'Meyer', 'Weber', 'Wagner', 'Schulz', 'Becker', 'Nagy', 'Kovacs', 'Toth', 'Szabo', 'Horvath', 'Varga', 'Kiss', 'Molnar', 'Nemeth', 'Farkas', 'Balogh', 'Papp', 'Lakatos', 'Takacs', 'Juhasz', 'Meszaros', 'Olah', 'Simon', 'Racz', 'Fekete', 'Szilagyi', 'Torok', 'Feher', 'Balazs', 'Gal', 'Most', 'Blondal', 'Thorarensen', 'Hansen', 'Olsen', 'Andersen', 'Petersen', 'Moller', 'Nielsen', 'Waage', 'Fjeldsted', 'Norðdahl', 'Ireland', 'Murphy', 'Walsh', 'Smith', 'Doyle', 'Mccarthy', 'Kennedy', 'Lynch', 'Murray', 'Rossi', 'Red', 'Russo', 'Ferrari', 'Blacksmith', 'Esposito', 'Exposed', 'Bianchi', 'White', 'Romano', 'Roman', 'Colombo', 'Dove', 'Bruno', 'Brown', 'Ricci', 'Curly', 'Greco', 'Greek', 'Marino', 'Gallo', 'Rooster', 'Conti', 'Count', 'Costa', 'Coast', 'Mancini', 'Left', 'Giordano', 'Jordan', 'Rizzo', 'Curly', 'Lombardi', 'Lombard', 'Barbieri', 'Barber', 'Moretti', 'Brown', 'Fontana', 'Fountain', 'Caruso', 'Mariani', 'Marian', 'Ferrara', 'Blacksmith', 'Santoro', 'Sanctorum', 'Rinaldi', 'Reynold', 'Leone', 'Lion', 'Longo', 'Long', 'Galli', 'Roosters', 'Martini', 'Martin', 'Martinelli', 'Martin', 'Serra', 'Saw', 'Conte', 'Count', 'Vitale', 'Vitale', 'Marchetti', 'Messina', 'Messina', 'Gentile', 'Gentle', 'Villa', 'Marini', 'Lombardo', 'Lombard', 'Coppola', 'Ferri', 'Parisi', 'Bianco', 'White', 'Amato', 'Beloved', 'Fabbri', 'Blacksmith', 'Gatti', 'Cats', 'Sala', 'Sala', 'Morelli', 'Grasso', 'Fat', 'Pellegrini', 'Pilgrims', 'Ferraro', 'Blacksmith', 'Monti', 'Mountains', 'Palumbo', 'Pigeon', 'Grassi', 'Fat', 'Testa', 'Head', 'Valentini', 'Carbone', 'Coal', 'Benedetti', 'Silvestri', 'Farina', 'Flour', 'Martino', 'Martin', 'Bernardi', 'Barnard', 'Caputo', 'Big', 'Mazza', 'Sanna', 'Fang', 'Fiore', 'Flower', 'Pellegrino', 'Pilgrim', 'Giuliani', 'Rizzi', 'Curly', 'Di', 'Cattaneo', 'Captain', 'Rossetti', 'Orlando', 'Basile', 'Basil', 'Neri', 'Black', 'Barone', 'Baron', 'Palmieri', 'Palmer', 'Riva', 'Shore', 'Romeo', 'Franco', 'Frank', 'Sorrentino', 'Pagano', 'Pagan', 'Piras', 'Pear', 'Ruggiero', 'Rodger', 'Montanari', 'Highlander', 'Battaglia', 'Fight', 'Bellini', 'Castelli', 'Castles', 'Guerra', 'War', 'Poli', 'Valente', 'Ferretti', 'Krasniqi', 'Gashi', 'Berisha', 'Morina', 'Shala', 'Bytyqi', 'Hasani', 'Kastrati', 'Kryeziu', 'Latvia', 'Berzins', 'Kalnins', 'Ozolins', 'Jansons', 'Ozols', 'Liepins', 'Krumins', 'Balodis', 'Eglitis', 'Zarins', 'Petersons', 'Vitols', 'Klavins', 'Karklins', 'Vanags', 'Kazlauskas', 'Jankauskas', 'Petrauskas', 'Stankevicius', 'Vasiliauskas', 'Butkus', 'Zukauskas', 'Paulauskas', 'Urbonas', 'Kavaliauskas', 'Entries', 'Borg', 'Camilleri', 'Vella', 'Farrugia', 'Zammit', 'Galea', 'Micallef', 'Grech', 'Attard', 'Spiteri', 'Rusu', 'Ceban', 'Ciobanu', 'Turcan', 'Cebotari', 'Sîrbu', 'Lungu', 'Munteanu', 'Rotari', 'Montenegro', 'Popovic', 'Markovic', 'Vujovic', 'Radovic', 'Ivanovic', 'Radulovic', 'Jovanovic', 'Perovic', 'Vukovic', 'Kovacevic', 'County', 'Percent', 'English', 'Jansen', 'Johnson', 'Van', 'Van', 'Bakker', 'Baker', 'Janssen', 'Johnson', 'Visser', 'Fisher', 'Smit', 'Smith', 'Mayor', 'Mulder', 'Miller', 'Bos', 'Bush', 'Vos', 'Fox', 'Peters', 'Peters', 'Hendriks', 'Henderson', 'Van', 'Dekker', 'Thatcher', 'Brouwer', 'Brewer', 'Dijkstra', 'Smits', 'Smith', 'Van', 'Vd', 'Van', 'Van', 'Andov', 'Angelov', 'Bogdanov', 'Bozinov', 'Brankov', 'Damcevski', 'Davidov', 'Dimitrov', 'Donev', 'Filipov', 'Georgiev', 'Ivanov', 'Ivanovski', 'Janev', 'Kitanovski', 'Koloski', 'Kostovski', 'Kostov', 'Manasievski', 'Markov', 'Markovski', 'Markoski', 'Matovski', 'Mladenovski', 'Nikolovski', 'Pavlovski', 'Penov', 'Petkov', 'Petrevski', 'Petrovski', 'Popoff', 'Popovski', 'Ristevski', 'Stojanov', 'Trajanoski', 'Trajanovski', 'Trajcevski', 'Trajkovski', 'Hansen', 'Johansen', 'Olsen', 'Larsen', 'Andersen', 'Pedersen', 'Nilsen', 'Kristiansen', 'Jensen', 'Karlsen', 'Johnsen', 'Pettersen', 'Eriksen', 'Berg', 'Haugen', 'Hagen', 'Johannessen', 'Andreassen', 'Jacobsen', 'Dahl', 'Jorgensen', 'Halvorsen', 'Henriksen', 'Lund', 'Nowak', 'Kowalski', 'Wisniewski', 'Wojcik', 'Kowalczyk', 'Kaminski', 'Lewandowski', 'Zielinski', 'Szymanski', 'Polish', 'Most', 'Silva', 'Santos', 'Ferreira', 'Pereira', 'Oliveira', 'Costa', 'Rodrigues', 'Martins', 'Jesus', 'Sousa', 'Fernandes', 'Goncalves', 'Gomes', 'Lopes', 'Marques', 'Alves', 'Almeida', 'Ribeiro', 'Pinto', 'Carvalho', 'Teixeira', 'Moreira', 'Correia', 'Mendes', 'Nunes', 'Soares', 'Vieira', 'Monteiro', 'Cardoso', 'Rocha', 'Neves', 'Coelho', 'Cruz', 'Cunha', 'Pires', 'Duarte', 'Reis', 'Simões', 'Antunes', 'Matos', 'Fonseca', 'Machado', 'Araujo', 'Barbosa', 'Tavares', 'Lourenco', 'Castro', 'Figueiredo', 'Azevedo', 'Freitas', 'Popa', 'Popescu', 'Pop', 'Radu', 'Dumitru', 'Stan', 'Stoica', 'Gheorghe', 'Matei', 'Ciobanu', 'Ionescu', 'Rusu', 'Most', 'Those', 'Jovanovic', 'Petrovic', 'Nikolic', 'Markovic', 'Dordevic', 'Stojanovic', 'Ilic', 'Stankovic', 'Pavlovic', 'Milosevic', 'Horvath', 'Kovac', 'Varga', 'Toth', 'Nagy', 'Balaz', 'Szabo', 'Molnar', 'Balog', 'Lukac', 'Novak', 'Kovacs', 'Polak', 'Gajdos', 'Kollar', 'Hudak', 'Nemeth', 'Kovacik', 'Olah', 'Oravec', 'Hungarians', 'Novak', 'Horvat', 'Kovacic', 'Krajnc', 'Zupancic', 'Potocnik', 'Kovac', 'Mlakar', 'Kos', 'Vidmar', 'Golob', 'Turk', 'Bozic', 'Kralj', 'Korosec', 'Zupan', 'Bizjak', 'Hribar', 'Kotnik', 'Kavcic', 'Rozman', 'Kastelic', 'Oblak', 'Zagar', 'Petek', 'Hocevar', 'Kolar', 'Kosir', 'Koren', 'Klemencic', 'Garcia', 'Fernandez', 'Gonzalez', 'Rodriguez', 'Lopez', 'Martinez', 'Sanchez', 'Perez', 'Martin', 'Gomez', 'Ruiz', 'Hernandez', 'Jimenez', 'Diaz', 'Alvarez', 'Moreno', 'Munoz', 'Alonso', 'Variation', 'Gutierrez', 'Romero', 'Pilgrim', 'Navarro', 'Torres', 'Dominguez', 'Gil', 'Vazquez', 'Serrano', 'Highlander', 'Ramos', 'Blanco', 'White', 'Sanz', 'Castro', 'Suarez', 'Ortega', 'Rubio', 'Molina', 'Delgado', 'Skinny', 'Ramirez', 'Morales', 'Blackberry', 'Ortiz', 'Marin', 'Latin', 'Iglesias', 'Churches', 'Data', 'Gonzalez', 'Rodriguez', 'Hernandez', 'Perez', 'Garcia', 'Martin', 'Santana', 'Diaz', 'Suarez', 'Sweden', 'Andersson', 'Johansson', 'Karlsson', 'Nilsson', 'Eriksson', 'Larsson', 'Olsson', 'Persson', 'Svensson', 'Gustafsson', 'Pettersson', 'Jonsson', 'Jansson', 'Hansson', 'Bengtsson', 'Jonsson', 'Lindberg', 'Jakobsson', 'Magnusson', 'Olofsson', 'Andersson', 'Johansson', 'Nilsson', 'Larsson', 'Persson', 'Blind', 'Jonsson', 'Eriksson', 'Nutti', 'Labba', 'Bianchi', 'Bernasconi', 'Fontana', 'Crivelli', 'Galli', 'Cereghetti', 'Colombo', 'Rossi', 'Ferrari', 'Cavadini', 'Sante', 'Ravelli', 'Giovanni', 'Piero', 'Muller', 'Meier', 'Schmid', 'Keller', 'Weber', 'Huber', 'Meyer', 'Schneider', 'Steiner', 'Fischer', 'Brunner', 'Baumann', 'Gerber', 'Frei', 'Moser', 'Yilmaz', 'Kaya', 'Demir', 'Sahin', 'Celik', 'Yildiz', 'Yildirim', 'Ozturk', 'Aydin', 'Ozdemir', 'Arslan', 'Dogan', 'Kilic', 'Aslan', 'Khan', 'Kara', 'Koc', 'Kurt', 'Ozkan', 'Simsek', 'Melnyk', 'Shevchenko', 'Boyko', 'Kovalenko', 'Bondarenko', 'Tkachenko', 'Kovalchuk', 'Kravchenko', 'Oliynyk', 'Shevchuk', 'Koval', 'Polishchuk', 'Bondar', 'Tkachuk', 'Moroz', 'Marchenko', 'Lysenko', 'Rudenko', 'Savchenko', 'Petrenko', 'Smith', 'Jones', 'Taylor', 'Brown', 'Williams', 'Wilson', 'Johnson', 'Davies', 'Robinson', 'Greater', 'Brown', 'Smith', 'Patel', 'Jones', 'Williams', 'Johnson', 'Taylor', 'Thomas', 'Roberts', 'Khan', 'Lewis', 'Jackson', 'Clarke', 'James', 'Phillips', 'Wilson', 'Ali', 'Mason', 'Mitchell', 'Rose', 'Davis', 'Davies', 'Rodriguez', 'Cox', 'Alexander', 'Wilson', 'Campbell', 'Kelly', 'Johnston', 'Moore', 'Thompson', 'Smyth', 'Brown', 'Scotland', 'Smith', 'Brown', 'Wilson', 'Robertson', 'Thomson', 'Campbell', 'Stewart', 'Anderson', 'Scott', 'Wales', 'Jones', 'Williams', 'Davies', 'Evans', 'Thomas', 'Roberts', 'Lewis', 'Hughes', 'Morgan']
     fantasyNames["masc"] = ['Lydan', 'Syrin', 'Ptorik', 'Joz', 'Varog', 'Gethrod', 'Hezra', 'Feron', 'Ophni', 'Colborn', 'Fintis', 'Gatlin', 'Jinto', 'Hagalbar', 'Krinn', 'Lenox', 'Revvyn', 'Hodus', 'Dimian', 'Paskel', 'Kontas', 'Weston', 'Azamarr', 'Jather', 'Tekren', 'Jareth', 'Adon', 'Zaden', 'Eune', 'Graff', 'Tez', 'Jessop', 'Gunnar', 'Pike', 'Domnhar', 'Baske', 'Jerrick', 'Mavrek', 'Riordan', 'Wulfe', 'Straus', 'Tyvrik', 'Henndar', 'Favroe', 'Whit', 'Jaris', 'Renham', 'Kagran', 'Lassrin', 'Vadim', 'Arlo', 'Quintis', 'Vale', 'Caelan', 'Yorjan', 'Khron', 'Ishmael', 'Jakrin', 'Fangar', 'Roux', 'Baxar', 'Hawke', 'Gatlen', 'Barak', 'Nazim', 'Kadric', 'Paquin', 'Kent', 'Moki', 'Rankar', 'Lothe', 'Ryven', 'Clawsen', 'Pakker', 'Embre', 'Cassian', 'Verssek', 'Dagfinn', 'Ebraheim', 'Nesso', 'Eldermar', 'Rivik', 'Rourke', 'Barton', 'Hemm', 'Sarkin', 'Blaiz', 'Talon', 'Agro', 'Zagaroth', 'Turrek', 'Esdel', 'Lustros', 'Zenner', 'Baashar', 'Dagrod', 'Gentar', 'Feston']
     fantasyNames["fem"] = ['Syrana', 'Resha', 'Varin', 'Wren', 'Yuni', 'Talis', 'Kessa', 'Magaltie', 'Aeris', 'Desmina', 'Krynna', 'Asralyn', 'Herra', 'Pret', 'Kory', 'Afia', 'Tessel', 'Rhiannon', 'Zara', 'Jesi', 'Belen', 'Rei', 'Ciscra', 'Temy', 'Renalee', 'Estyn', 'Maarika', 'Lynorr', 'Tiv', 'Annihya', 'Semet', 'Tamrin', 'Antia', 'Reslyn', 'Basak', 'Vixra', 'Pekka', 'Xavia', 'Beatha', 'Yarri', 'Liris', 'Sonali', 'Razra', 'Soko', 'Maeve', 'Everen', 'Yelina', 'Morwena', 'Hagar', 'Palra', 'Elysa', 'Sage', 'Ketra', 'Lynx', 'Agama', 'Thesra', 'Tezani', 'Ralia', 'Esmee', 'Heron', 'Naima', 'Rydna', 'Sparrow', 'Baakshi', 'Ibera', 'Phlox', 'Dessa', 'Braithe', 'Taewen', 'Larke', 'Silene', 'Phressa', 'Esther', 'Anika', 'Rasy', 'Harper', 'Indie', 'Vita', 'Drusila', 'Minha', 'Surane', 'Lassona', 'Merula', 'Kye', 'Jonna', 'Lyla', 'Zet', 'Orett', 'Naphtalia', 'Turi', 'Rhays', 'Shike', 'Hartie', 'Beela', 'Leska', 'Vemery', 'Lunex', 'Fidess', 'Tisette', 'Partha']
-    fantasyNames["neut"] = europeNames["neut"]
+    fantasyNames["neut"] = ['Aderyn', 'Aednat', 'Aemilia', 'Aeron', 'Aeschere', 'Aeslin', 'Afallon', 'Aiko', 'Aislin', 'Angus', 'Ashley', 'Avery', 'Awen', 'Bairn', 'Beagan', 'Blaine', 'Blair', 'Briar', 'Bryn', 'Cailean', 'Cameron', 'Carlyn', 'Carol', 'Clair', 'Coney', 'Cory', 'Cymbaline', 'Daire', 'Dove', 'Dylan', 'Earley', 'Eldhrimnir', 'Endewyn', 'Esprit', 'Evelyn', 'Fannar', 'Greer', 'Gwyneira', 'Harden', 'Harley', 'Hayden', 'Heidrun', 'Ivo', 'Kai', 'Kieran', 'Korrigan', 'Lumi', 'Murtagh', 'Neave', 'Nevada', 'Orla', 'Osier', 'Paris', 'Quince', 'Raleigh', 'Rana', 'Robin', 'Also', 'Rowan', 'Ruari', 'Rue', 'Ryan', 'Savin', 'Savine', 'Seanan', 'Seren', 'Shannon', 'Solana', 'Starling', 'Suvi', 'Teagan', 'Thorley', 'Tyler', 'Vail', 'Vale', 'Vernal', 'Vyri', 'Wynnfrith', 'Yvonne', 'Zenon']
     fantasyNames["sur"] = ['Atwater', 'Agassi', 'Apatow', 'Akagawa', 'Averescu', 'Arrington', 'Agrippa', 'Aiken', 'Albertson', 'Alexander', 'Amado', 'Anders', 'Ashsorrow', 'Humblecut', 'Ashbluff', 'Marblemaw', 'Armas', 'Akka', 'Aoki', 'Aldrich', 'Apak', 'Alinsky', 'Desai', 'Darby', 'Draper', 'Dwyer', 'Dixon', 'Danton', 'Desmith', 'Ditka', 'Dominguez', 'Decker', 'Dobermann', 'Dunlop', 'Dumont', 'Dandridge', 'Diamond', 'Dobra', 'Dukas', 'Agnello', 'Alterio', 'Bidbury', 'Botkin', 'Benoit', 'Biddercombe', 'Baldwin', 'Bennett', 'Bourland', 'Boadle', 'Bender', 'Best', 'Bobshaw', 'Bersa', 'Belt', 'Bourn', 'Barke', 'Beebe', 'Banu', 'Bozzelli', 'Bogaerts', 'Blanks', 'Evert', 'Eastwood', 'Elway', 'Eslinger', 'Ellerbrock', 'Eno', 'Endo', 'Etter', 'Ebersol', 'Everson', 'Esapa', 'Ekker', 'Escobar', 'Eggleston', 'Ermine', 'Erickson', 'Keller', 'Kessler', 'Kobayashi', 'Klecko', 'Kicklighter', 'Kidder', 'Kershaw', 'Kaminsky', 'Kirby', 'Keene', 'Kenny', 'Keogh', 'Kipps', 'Kendrick', 'Kuang', 'Fairchild', 'October', 'Vespertine', 'Fellowes', 'Omen', 'Willow', 'Gannon', 'Presto', 'Windward', 'Grell', 'Powers', 'Wixx', 'Halliwell', 'Quellings', 'Xanthos', 'Hightower', 'Quill', 'Xenides', 'Idlewind', 'Rast', 'Chamillet', 'Bougaitelet', 'Hallowswift', 'Coldsprinter', 'Winddane', 'Yarrow', 'Illfate', 'Riddle', 'Yew', 'Jacaranda', 'Yearwood', 'Yellen', 'Yaeger', 'Yankovich', 'Yamaguchi', 'Yarborough', 'Youngblood', 'Yanetta', 'Yadao', 'Winchell', 'Winters', 'Walsh', 'Whalen', 'Watson', 'Wooster', 'Woodson', 'Winthrop', 'Wall', 'Sacredpelt', 'Rapidclaw', 'Hazerider', 'Shadegrove', 'Wight', 'Webb', 'Woodard', 'Wixx', 'Wong', 'Whesker', 'Yale', 'Yasumoto', 'Yates', 'Younger', 'Yoakum', 'York', 'Rigby', 'Zaba', 'Surrett', 'Swiatek', 'Sloane', 'Stapleton', 'Seibert', 'Stroud', 'Strode', 'Stockton', 'Scardino', 'Spacek', 'Spieth', 'Stitchen', 'Stiner', 'Soria', 'Saxon', 'Shields', 'Stelly', 'Steele', 'Chanassard', 'Ronchessac', 'Boneflare', 'Monsterbelly', 'Truthbelly', 'Sacredmore', 'Malfoy', 'Moses', 'Moody', 'Morozov', 'Mason', 'Metcalf', 'Mc', 'Montero', 'Molinari', 'Marsh', 'Moffett', 'Mc', 'Manus', 'Malenko', 'Mullinax', 'Morrissey', 'Mantooth', 'Mintz']
     futuristicNames["masc"] = ['Adlai', 'Alaric', 'Anakin', 'Arsenio', 'Artemis', 'Aurelius', 'Auryn', 'Azriel', 'Cael', 'Calihan', 'Carrew', 'Cashel', 'Caspian', 'Cassian', 'Cedro', 'Cian', 'Cillian', 'Colton', 'Crispin', 'Drake', 'Derry', 'Edsel', 'Elson', 'Elwyn', 'Ephraim', 'Esai', 'Espen', 'Evander', 'Everard', 'Eythor', 'Finian', 'Fio', 'Freddy', 'Harlin', 'Jacob', 'Jax', 'Jethro', 'Jonas', 'Kaiser', 'Kalel', 'Kasper', 'Klay', 'Knox', 'Luca', 'Ludek', 'Micaiah', 'Mircea', 'Noe', 'Nye', 'Oren', 'Perrin', 'Renan', 'Rivo', 'Ruairi', 'Rui', 'Rune', 'Rye', 'Ryker', 'Sagan', 'Salix', 'Saylor', 'Schyler', 'Silas', 'Solon', 'Stellan', 'Sulien', 'Sven', 'Tae', 'Theron', 'Tovio', 'Torin', 'Tyrion', 'Uriah', 'Wilbur', 'Wystan', 'Xander', 'Xavion', 'Zaiden', 'Zen', 'Zephyr']
     futuristicNames["fem"] = ['Alessa', 'Annora', 'Archie', 'Ariana', 'Ariella', 'Arvilla', 'Arwen', 'Arya', 'Astoria', 'Astra', 'Astrid', 'Ayelet', 'Azura', 'Baila', 'Blaise', 'Blythe', 'Caia', 'Calla', 'Callista', 'Camila', 'Candela', 'Carabelle', 'Ceres', 'Charolet', 'Colma', 'Cosima', 'Crescentia', 'Cytherea', 'Dael', 'Dalla', 'Dawnelle', 'Delya', 'Drea', 'Eila', 'Elenyi', 'Eliette', 'Elowen', 'Elya', 'Ensley', 'Eowyn', 'Erinna', 'Etta', 'Eulalie', 'Evrim', 'Evuska', 'Ezri', 'Falynn', 'Fantasia', 'Felicity', 'Harper', 'Ilaria', 'Imelda', 'Ivara', 'Jada', 'Junia', 'Juniper', 'Karis', 'Kiska', 'Luna', 'Lyra', 'Lystra', 'Malone', 'Mazarine', 'Minerva', 'Morena', 'Natania', 'Neriah', 'Nolwenn', 'Novelia', 'Ophelia', 'Orsa', 'Paisley', 'Rhett', 'Riella', 'Saretta', 'Secora', 'Siloh', 'Thyra', 'Tove', 'Vanina', 'Violet', 'Wynn', 'Zeline', 'Zosia']
-    futuristicNames["neut"] = europeNames["neut"]
+    futuristicNames["neut"] = ['Aderyn', 'Aednat', 'Aemilia', 'Aeron', 'Aeschere', 'Aeslin', 'Afallon', 'Aiko', 'Aislin', 'Angus', 'Ashley', 'Avery', 'Awen', 'Bairn', 'Beagan', 'Blaine', 'Blair', 'Briar', 'Bryn', 'Cailean', 'Cameron', 'Carlyn', 'Carol', 'Clair', 'Coney', 'Cory', 'Cymbaline', 'Daire', 'Dove', 'Dylan', 'Earley', 'Eldhrimnir', 'Endewyn', 'Esprit', 'Evelyn', 'Fannar', 'Greer', 'Gwyneira', 'Harden', 'Harley', 'Hayden', 'Heidrun', 'Ivo', 'Kai', 'Kieran', 'Korrigan', 'Lumi', 'Murtagh', 'Neave', 'Nevada', 'Orla', 'Osier', 'Paris', 'Quince', 'Raleigh', 'Rana', 'Robin', 'Also', 'Rowan', 'Ruari', 'Rue', 'Ryan', 'Savin', 'Savine', 'Seanan', 'Seren', 'Shannon', 'Solana', 'Starling', 'Suvi', 'Teagan', 'Thorley', 'Tyler', 'Vail', 'Vale', 'Vernal', 'Vyri', 'Wynnfrith', 'Yvonne', 'Zenon']
     futuristicNames["sur"] = ['Alcantar', 'Alken', 'Kiani', 'Verrill', 'Racine', 'Kiani', 'Solari', 'Jaenke', 'Bowdoin', 'Racine', 'Weyer', 'Wynn', 'Sanghvi', 'McRaven', 'Severt', 'Lavigne', 'Solari', 'Lockley', 'Vangelos', 'Irani', 'Wescott', 'Kniffin', 'Graydon', 'Bowdoin', 'Wyse', 'Lavigne', 'Dewitt', 'Kader', 'Nesheim', 'Woldt', 'Wakeman', 'Dilucca', 'Alcantar', 'Dewitt', 'Amano', 'Maille', 'Rhyne', 'Solari', 'Sabine', 'Berrett', 'Mo-Chi', 'Siu', 'Fu', 'Liu-Sho', 'Bo-She', 'Xi', 'Sai', 'Wei', 'Kway-Koi', 'Hwa', 'Hi', 'Zhao', 'Chao-Loo', 'Chi', 'Hu-Tao', 'Too', 'Zi', 'Huo', 'Mao', 'Le-Ju', 'Hu-Jue', 'Miao', 'Chwai-Hai', 'Xia', 'Fei-Na', 'Lee-Li', 'Xue-Ha', 'Mae-Jai', 'Shoi-Xiu', 'Na', 'Ku', 'Fu', 'Yuan', 'Na', 'Wei', 'Shu', 'Gui', 'Xia', 'Pei', 'Jue', 'Teiki', 'Hiro', 'Kako', 'Sane', 'Tada', 'Toyoto', 'Toshi', 'Tetsu', 'Taki', 'Masu', 'Kumi', 'Yumit', 'Mayoko', 'Fusu', 'Yukomi', 'Mide', 'Suzue', 'Sachie', 'Shina', 'Kichi', 'Gavrina', 'Tukhborei', 'Mikova', 'Groshistya', 'Bobore', 'Kina', 'Ovanov', 'Gova', 'Biniky', 'Plobenko', 'Pina', 'Mova', 'Kova', 'Ploudema', 'Nikofa', 'Tyrsko', 'Semonte', 'Sova', 'Moltova', 'Pova', 'Kuva', 'Lebore', 'Bina', 'Pove', 'Ginova', 'Supoloi', 'Ovarov', 'Kova', 'Olev', 'Cherova', 'Mova', 'Prova', 'Metukhba', 'Ovarnov', 'Denkatze', 'Gulova', 'Sovelai', 'Biky', 'Sova', 'Kolina', 'Pere', 'Brusson', 'Rookson', 'Diazal', 'Whowards', 'Hezal', 'Righte', 'Hayeson', 'Rogers', 'Garce', 'Jamoor', 'Robak', 'Cooker', 'Tere', 'Wisanch', 'Bryante', 'Grownes', 'Butly', 'Turnes', 'Carte', 'Russon', 'Reedez', 'Wriffost', 'Jenker', 'Rodra', 'Grezal', 'Grodre', 'Ancher', 'Colee', 'Thomart', 'Helly', 'Coxand', 'Sones', 'Pery', 'Jamill', 'Sanchy', 'Coxand', 'Kera', 'Grezal', 'Wison']
-    try:
-        listExceptionsEnvironment = ["japan", "europe", "america", "historical", "modern", "futuristic", "fantasy"]
-        listExceptionsCharacterTypes = ["cis_men", "cis_women", "nonbinary", "trans_men", "trans_women", "futanari"]
-        listExceptionsCharacterSpecies = ['mammals', 'reptiles', 'fish', 'birds', 'insects', 'arachnids', 'humans', 'elves', 'dwarves', 'halflings', 'gnomes', 'tieflings', 'merfolk', 'orcs', 'goliaths', 'goblinoids', 'ilithids', 'slimes', 'tentacles', 'dryads', 'harpies', 'lamia', 'centaurs', 'minotaurs', 'giants', 'werebeasts', 'vampires', 'undead', 'demons', 'angels', 'faeries', 'cyborgs', 'androids', 'robots', 'humanoid_aliens', 'aliens']
-        listExceptionsPlay = ['romance', 'kissing', 'cuddling', 'petting', 'grinding', 'titjobs', 'ass', 'manual_sex', 'oral_sex', 'intercrural_sex', 'penetrative_sex', 'basic_toys', 'age_play', 'bondage', 'biting', 'breast_play', 'impact_play', 'orgasm_control', 'genitorture', 'cuckoldry', 'cupping', 'dom_and_sub', 'knife_play', 'electro_play', 'food_play', 'temperature_play', 'fire_play', 'fisting', 'foot_play', 'degradation', 'exhibition', 'pet_play', 'piss_play', 'consensual_nonconsent', 'sensory_deprivation', 'sounding', 'intoxicants', 'incest', 'bestiality', 'size_play', 'partial_growth', 'extreme_insertions', 'inflation', 'transformation', 'impregnation', 'oviposition', 'dubious_consent', 'nonconsent', 'torture', 'gore', 'soft_vore', 'hard_vore', 'snuff', 'necrophilia']
-        poolEnvironments = []
-        poolCharacterTypes = []
-        poolCharacterSpecies = []
-        poolScenes = []
-        poolPlay = []
+    listExceptionsEnvironment = ["japan", "europe", "america", "historical", "modern", "futuristic", "fantasy"]
+    listExceptionsCharacterTypes = ["cis_men", "cis_women", "nonbinary", "trans_men", "trans_women", "futanari"]
+    listExceptionsCharacterSpecies = ['mammals', 'reptiles', 'fish', 'birds', 'insects', 'arachnids', 'humans', 'elves', 'dwarves', 'halflings', 'gnomes', 'tieflings', 'merfolk', 'orcs', 'goliaths', 'goblinoids', 'ilithids', 'slimes', 'tentacles', 'dryads', 'harpies', 'lamia', 'centaurs', 'minotaurs', 'giants', 'werebeasts', 'vampires', 'undead', 'demons', 'angels', 'faeries', 'cyborgs', 'androids', 'robots', 'humanoid_aliens', 'aliens']
+    listExceptionsPlay = ['romance', 'kissing', 'cuddling', 'petting', 'grinding', 'titjobs', 'ass', 'manual_sex', 'oral_sex', 'intercrural_sex', 'penetrative_sex', 'basic_toys', 'age_play', 'bondage', 'biting', 'breast_play', 'impact_play', 'orgasm_control', 'genitorture', 'cuckoldry', 'cupping', 'dom_and_sub', 'knife_play', 'electro_play', 'food_play', 'temperature_play', 'fire_play', 'fisting', 'foot_play', 'degradation', 'exhibition', 'pet_play', 'piss_play', 'consensual_nonconsent', 'sensory_deprivation', 'sounding', 'intoxicants', 'incest', 'bestiality', 'size_play', 'partial_growth', 'extreme_insertions', 'inflation', 'transformation', 'impregnation', 'oviposition', 'dubious_consent', 'nonconsent', 'torture', 'gore', 'soft_vore', 'hard_vore', 'snuff', 'necrophilia']
+    poolEnvironments = []
+    poolCharacterTypes = []
+    poolCharacterSpecies = []
+    poolScenes = []
+    poolPlay = []
+    def exceptionTrimmer(listName):
         config = configparser.ConfigParser()
         configPath = ap(f'{guildID}.ini')
-        config.read(configPath)       
-        def exceptionTrimmer(listName):
-            if f'{channelID}' in config.sections():
-                def getLISection(li):
-                    if li in config[f'{channelID}']:
-                        return config[f'{channelID}']
-                    else:
-                        return config['default']
-                listName[:] = [li for li in listName if not getLISection(li).getboolean(li)]        
-            else:
-                listName[:] = [li for li in listName if not config['default'].getboolean(li)]       
-        exceptionTrimmer(listExceptionsEnvironment)
-        exceptionTrimmer(listExceptionsCharacterTypes)
-        exceptionTrimmer(listExceptionsCharacterSpecies)
-        exceptionTrimmer(listExceptionsPlay)      
-        def poolPopulator(listName, exceptionsName, poolName):
-            for ld in listName:
-                if not any(item in ld.tags for item in exceptionsName):
-                    poolName.append(ld)    
-        poolPopulator(listEnvironments, listExceptionsEnvironment, poolEnvironments)
-        poolPopulator(listCharacterTypes, listExceptionsCharacterTypes, poolCharacterTypes)
-        poolPopulator(listCharacterSpecies, listExceptionsCharacterSpecies, poolCharacterSpecies)
-        poolPopulator(listPlay, listExceptionsPlay, poolPlay)
-        playNumber = getConfigInt(guildID, channelID, "play_number")
-        characterNumber = getConfigInt(guildID, channelID, "character_number")
-        cisMen = getConfigBool(guildID, channelID, "cis_men")
-        cisWomen = getConfigBool(guildID, channelID, "cis_women")
-        if cisMen or cisWomen:
-            cisgenderBias = []
-            if cisMen:
-                cisgenderBias.append(ld(listCharacterTypes, 'cis man', 'cis_men'))
-            if cisWomen:
-                cisgenderBias.append(ld(listCharacterTypes, 'cis woman', 'cis_women'))
-            for cis in range(0, ceil(len(poolCharacterTypes)*1.6)):
-                poolCharacterTypes.append(random.choice(cisgenderBias))      
-        if getConfigBool(guildID, channelID, "humans"):
-            for hu in range(0, len(poolCharacterSpecies)):
-                poolCharacterSpecies.append(ld(listCharacterSpecies, 'a human', 'humans'))    
-        environment = random.choice(poolEnvironments)
-        for sce in listScenes:
-            if all(item in environment.tags for item in sce.tags):
-                poolScenes.append(sce) 
-        scene = random.choice(poolScenes)
-        characterText = []
-        for ct in range(0, characterNumber):
-            tempType = random.choice(poolCharacterTypes)
-            tempSpecies = random.choice(poolCharacterSpecies)
-            def nameFinder(type):
-                if "europe" in environment.tags:
-                    n = random.randint(1,12)
-                    if n > 4:
-                        return random.choice(europeNames[type])
-                    if n == 4:
-                        return random.choice(americaNames[type])
-                    if n == 3:
-                        return random.choice(japanNames[type])
-                    if n == 2:
-                        return random.choice(fantasyNames[type])
-                    if n == 1:
-                        return random.choice(futuristicNames[type])
-                elif "japan" in environment.tags:
-                    n = random.randint(1,12)
-                    if n > 4:
-                        return random.choice(japanNames[type])
-                    if n == 4:
-                        return random.choice(americaNames[type])
-                    if n == 3:
-                        return random.choice(europeNames[type])
-                    if n == 2:
-                        return random.choice(fantasyNames[type])
-                    if n == 1:
-                        return random.choice(futuristicNames[type])
-                elif "fantasy" in environment.tags and len(environment.tags) == 1:
-                    n = random.randint(1,12)
-                    if n > 4:
-                        return random.choice(fantasyNames[type])
-                    if n == 4:
-                        return random.choice(americaNames[type])
-                    if n == 3:
-                        return random.choice(japanNames[type])
-                    if n == 2:
-                        return random.choice(europeNames[type])
-                    if n == 1:
-                        return random.choice(futuristicNames[type])
-                elif "futuristic" in environment.tags and len(environment.tags) == 1:
-                    n = random.randint(1,12)
-                    if n > 4:
-                        return random.choice(futuristicNames[type])
-                    if n == 4:
-                        return random.choice(americaNames[type])
-                    if n == 3:
-                        return random.choice(japanNames[type])
-                    if n == 2:
-                        return random.choice(fantasyNames[type])
-                    if n == 1:
-                        return random.choice(europeNames[type])
+        config.read(configPath)
+        if f'{channelID}' in config.sections():
+            def getLISection(li):
+                if li in config[f'{channelID}']:
+                    return config[f'{channelID}']
                 else:
-                    n = random.randint(1,12)
-                    if n > 4:
-                        return random.choice(americaNames[type])
-                    if n == 4:
-                        return random.choice(europeNames[type])
-                    if n == 3:
-                        return random.choice(japanNames[type])
-                    if n == 2:
-                        return random.choice(fantasyNames[type])
-                    if n == 1:
-                        return random.choice(futuristicNames[type])
-            if tempType.text in ["cis man", "trans man"]:
-                tempFirstName = nameFinder("masc")
-            elif tempType.text in ["cis woman", "trans woman", "futanari"]:
-                tempFirstName = nameFinder("fem")
-            else:
-                tempFirstName = nameFinder("neut")
-            tempSurName = nameFinder("sur")
-            characterText.append(f"\n*{tempFirstName} {tempSurName}:* {tempSpecies.text} {tempType.text}")
-        characterText = "".join(characterText)
-        if playNumber <= len(poolPlay):
-            playList = random.sample(poolPlay, playNumber)
+                    return config['default']
+            listName[:] = [li for li in listName if not getLISection(li).getboolean(li)]        
         else:
-            playList = poolPlay
-        playText = []
-        for pl in playList:
-            playText.append(pl.text)
-        playText = ", ".join(playText)
-        promptCode = str(random.randint(1, 9999)).zfill(4)
-        conMin = getConfig(guildID, channelID, "contributor_minimum")
-        conMax = getConfig(guildID, channelID, "contributor_maximum")
-        promptText = ">>> **New Round-Robbin Writing Prompt**"
-        if getConfigBool(guildID, channelID, "environments"):
-            promptText += f"\n**Setting:** {environment.text}"
-        if getConfigBool(guildID, channelID, "characters"):
-            promptText += f"\n**Characters:** {characterText}"
-        if getConfigBool(guildID, channelID, "scenes"):
-            promptText += f"\n**Scene:** {scene.text}"
-        if getConfigBool(guildID, channelID, "play"):
-            promptText += f"\n**Play Suggestions:** {playText}"
-        promptText += f"\n**Prompt Code:** {promptCode}"
-        addConfig(guildID, channelID, "promptText", promptText)
-        promptConLine = f"\n**Contributors:** 0/{conMax} ({conMin} required)"
-        addConfig(guildID, channelID, "promptCode", promptCode)
-        addConfig(guildID, channelID, "promptContributions", 0)
-        contributorsConfig(guildID, channelID)
-        return promptText + promptConLine + promptReminder
-    except:
-        return "Prompt generation failed. This happens on occasion. Press :arrows_counterclockwise: to try again. If generation continues to fail, make sure you have at least one item allowed from each prompt settings category."
-
+            listName[:] = [li for li in listName if not config['default'].getboolean(li)]       
+    def poolPopulator(listName, exceptionsName, poolName):
+        for ld in listName:
+            if not any(item in ld.tags for item in exceptionsName):
+                poolName.append(ld)
+    #try:
+    exceptionTrimmer(listExceptionsEnvironment)
+    exceptionTrimmer(listExceptionsCharacterTypes)
+    exceptionTrimmer(listExceptionsCharacterSpecies)
+    exceptionTrimmer(listExceptionsPlay)      
+    poolPopulator(listEnvironments, listExceptionsEnvironment, poolEnvironments)
+    poolPopulator(listCharacterTypes, listExceptionsCharacterTypes, poolCharacterTypes)
+    poolPopulator(listCharacterSpecies, listExceptionsCharacterSpecies, poolCharacterSpecies)
+    poolPopulator(listPlay, listExceptionsPlay, poolPlay)
+    playNumber = getConfigInt(guildID, channelID, "play_number")
+    characterNumber = getConfigInt(guildID, channelID, "character_number")
+    cisMen = getConfigBool(guildID, channelID, "cis_men")
+    cisWomen = getConfigBool(guildID, channelID, "cis_women")
+    if cisMen or cisWomen:
+        cisgenderBias = []
+        if cisMen:
+            cisgenderBias.append(ld('cis man', 'cis_men'))
+        if cisWomen:
+            cisgenderBias.append(ld('cis woman', 'cis_women'))
+        for cis in range(0, ceil(len(poolCharacterTypes)*1.6)):
+            poolCharacterTypes.append(random.choice(cisgenderBias))      
+    if getConfigBool(guildID, channelID, "humans"):
+        for hu in range(0, len(poolCharacterSpecies)):
+            poolCharacterSpecies.append(ld('a human', 'humans'))    
+    environment = random.choice(poolEnvironments)
+    for sce in listScenes:
+        if all(item in environment.tags for item in sce.tags):
+            poolScenes.append(sce) 
+    scene = random.choice(poolScenes)
+    characterText = []
+    for ct in range(0, characterNumber):
+        tempType = random.choice(poolCharacterTypes)
+        tempSpecies = random.choice(poolCharacterSpecies)
+        def nameFinder(type):
+            if "europe" in environment.tags:
+                n = random.randint(1,12)
+                if n > 4:
+                    return random.choice(europeNames[type])
+                if n == 4:
+                    return random.choice(americaNames[type])
+                if n == 3:
+                    return random.choice(japanNames[type])
+                if n == 2:
+                    return random.choice(fantasyNames[type])
+                if n == 1:
+                    return random.choice(futuristicNames[type])
+            elif "japan" in environment.tags:
+                n = random.randint(1,12)
+                if n > 4:
+                    return random.choice(japanNames[type])
+                if n == 4:
+                    return random.choice(americaNames[type])
+                if n == 3:
+                    return random.choice(europeNames[type])
+                if n == 2:
+                    return random.choice(fantasyNames[type])
+                if n == 1:
+                    return random.choice(futuristicNames[type])
+            elif "fantasy" in environment.tags and len(environment.tags) == 1:
+                n = random.randint(1,12)
+                if n > 4:
+                    return random.choice(fantasyNames[type])
+                if n == 4:
+                    return random.choice(americaNames[type])
+                if n == 3:
+                    return random.choice(japanNames[type])
+                if n == 2:
+                    return random.choice(europeNames[type])
+                if n == 1:
+                    return random.choice(futuristicNames[type])
+            elif "futuristic" in environment.tags and len(environment.tags) == 1:
+                n = random.randint(1,12)
+                if n > 4:
+                    return random.choice(futuristicNames[type])
+                if n == 4:
+                    return random.choice(americaNames[type])
+                if n == 3:
+                    return random.choice(japanNames[type])
+                if n == 2:
+                    return random.choice(fantasyNames[type])
+                if n == 1:
+                    return random.choice(europeNames[type])
+            else:
+                n = random.randint(1,12)
+                if n > 4:
+                    return random.choice(americaNames[type])
+                if n == 4:
+                    return random.choice(europeNames[type])
+                if n == 3:
+                    return random.choice(japanNames[type])
+                if n == 2:
+                    return random.choice(fantasyNames[type])
+                if n == 1:
+                    return random.choice(futuristicNames[type])
+        if tempType.text in ["cis man", "trans man"]:
+            tempFirstName = nameFinder("masc")
+        elif tempType.text in ["cis woman", "trans woman", "futanari"]:
+            tempFirstName = nameFinder("fem")
+        else:
+            tempFirstName = nameFinder("neut")
+        tempSurName = nameFinder("sur")
+        characterText.append(f"\n*{tempFirstName} {tempSurName}:* {tempSpecies.text} {tempType.text}")
+    characterText = "".join(characterText)
+    if playNumber <= len(poolPlay):
+        playList = random.sample(poolPlay, playNumber)
+    else:
+        playList = poolPlay
+    playText = []
+    for pl in playList:
+        playText.append(pl.text)
+    playText = ", ".join(playText)
+    promptCode = str(random.randint(1, 9999)).zfill(4)
+    conMin = getConfig(guildID, channelID, "contributor_minimum")
+    conMax = getConfig(guildID, channelID, "contributor_maximum")
+    promptText = ">>> **New Round-Robbin Writing Prompt**"
+    if getConfigBool(guildID, channelID, "environments"):
+        promptText += f"\n**Setting:** {environment.text}"
+    if getConfigBool(guildID, channelID, "characters"):
+        promptText += f"\n**Characters:** {characterText}"
+    if getConfigBool(guildID, channelID, "scenes"):
+        promptText += f"\n**Scene:** {scene.text}"
+    if getConfigBool(guildID, channelID, "play"):
+        promptText += f"\n**Play Suggestions:** {playText}"
+    promptText += f"\n**Prompt Code:** {promptCode}"
+    addConfig(guildID, channelID, "promptText", promptText)
+    promptConLine = f"\n**Contributors:** 0/{conMax} ({conMin} required)"
+    addConfig(guildID, channelID, "promptCode", promptCode)
+    addConfig(guildID, channelID, "promptContributions", 0)
+    contributorsConfig(guildID, channelID)
+    return promptText + promptConLine + promptReminder
+    #except:
+    #    return "Prompt generation failed. This happens on occasion. Press :arrows_counterclockwise: to try again. If generation continues to fail, make sure you have at least one item allowed from each prompt settings category."
+        
 def createGuildConfig(guildID):
     config = configparser.ConfigParser()
     configPath = ap(f'{guildID}.ini')
