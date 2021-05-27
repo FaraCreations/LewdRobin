@@ -21,9 +21,9 @@ All of LewdRobin's user-facing features can be accessed either through slash com
 **5.**  Your turn will end automatically after its designated duration is over. You can end it early with ⏩ or /pass. You can also drop from the prompt at any time with ❎ (on the DM LewdRobin sent you when your turn started or the prompt itself) or /drop. If you don't post a contribution or pass your turn within the time limit, you will be dropped from the prompt for inactivity.
 
 ## Admin Startup
-*step-by-step guide to get me set up on your server*
+*step-by-step guide to get LewdRobin set up on your server*
 
-**1.**  Use this link to add me to your server:
+**1.**  Use this link to add LewdRobin to your server:
 
 <https://discord.com/api/oauth2/authorize?client_id=839249838972862535&permissions=76864&scope=bot%20applications.commands>
 
