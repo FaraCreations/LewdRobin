@@ -95,3 +95,11 @@ This feature is still under development, and the related /time command doesn't d
 I spent a lot of time lovingly coding to make LewdRobin work. If you'd like to send me a tip, you can do so via:
 
 <https://paypal.me/FaraCreations>
+
+# Change Log
+
+5/27/21 - LewdRobin 1.01
+ - Fixed memory leak in promptGenerator
+
+5/26/21 - LewdRobin 1.0 
+ - Initial Release
