@@ -35,7 +35,7 @@ dname = os.path.dirname(ap(__file__))
 initialize = {}
 initialize["guildCommands"] = True
 initialize["globalCommands"] = True
-botToken = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+botToken = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
 headers = {"Authorization": f"Bot {botToken}"}
 promptReminder = "\n*Reactions: :white_check_mark: join this prompt; :negative_squared_cross_mark: drop from the prompt; :play_pause: pause or resume the prompt;  :arrows_counterclockwise: generate a new prompt; :question: open the help menu.*"
 listEnvironments = []
@@ -2335,6 +2335,8 @@ async def on_interaction(data):
         member = await iGuild.fetch_member(userID)
         if member.guild_permissions.administrator:
             serverAdmin = True
+        else:
+            serverAdmin = False
     except:
         serverAdmin = False
     try:
