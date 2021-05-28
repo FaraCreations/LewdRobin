@@ -35,7 +35,7 @@ dname = os.path.dirname(ap(__file__))
 initialize = {}
 initialize["guildCommands"] = True
 initialize["globalCommands"] = True
-botToken = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+botToken = "yourToken"
 headers = {"Authorization": f"Bot {botToken}"}
 promptReminder = "\n*Reactions: :white_check_mark: join this prompt; :x: drop from the prompt; :play_pause: pause or resume the prompt;  :arrows_counterclockwise: generate a new prompt; :question: open the help menu.*"
 listEnvironments = []
@@ -2566,6 +2566,8 @@ async def on_raw_reaction_add(payload):
             roles = [str(x.id) for x in member.roles]
             if member.guild_permissions.administrator:
                 serverAdmin = True
+            else:
+                serverAdmin = False
         except:
             roles = []
             serverAdmin = False
