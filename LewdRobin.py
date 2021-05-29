@@ -37,7 +37,7 @@ initialize = {}
 initialize["on_ready"] = False
 initialize["guildCommands"] = True
 initialize["globalCommands"] = True
-botToken = "XXXXXX"
+botToken = "ODM5MjQ5ODM4OTcyODYyNTM1.YJG6Ug.AV9mazJ00MNOxDoxgZYm_ePatxY"
 headers = {"Authorization": f"Bot {botToken}"}
 promptReminder = "\n*Reactions: :white_check_mark: join this prompt; :x: drop from the prompt; :play_pause: pause or resume the prompt;  :arrows_counterclockwise: generate a new prompt; :question: open the help menu.*"
 listEnvironments = []
@@ -2738,7 +2738,8 @@ async def timer_loop():
                                     for id in pool:
                                         u = await bot.fetch_user(id)
                                         await u.send(f"Prompt {promptCode} has dropped below the minimum required contributors and has paused. It will resume when sufficient contributors have joined.")
-                        else:
+                        nextTurn(guildID, channelID)
+                        if contributions != conChannel["contributions"]:
                             position = pool.index(userID)
                             if position >= turn:
                                 wait = position - turn
@@ -2747,9 +2748,13 @@ async def timer_loop():
                             waitTime = wait*turnLength
                             user = await bot.fetch_user(userID)
                             await user.send(f"Your turn for prompt {promptCode} has automatically ended. It will be your turn in {wait} turns. Your next turn will begin in at most {waitTime} minutes.")
-                        contributors["postMode"].pop(f"{userID}", None)
-                        nextTurn(guildID, channelID)
                         if len(pool) >= getConfigInt(guildID, channelID, 'contributor_minimum'):
+                            nextTime = ns() + 60000000000*turnLength
+                            conChannel["timer"] = nextTime
+                            nextUID = pool[conChannel["turn"]]
+                            nextUser = await bot.fetch_user(nextUID)
+                            createTimer(nextTime, "autopass", guildID, channelID, promptCode, nextUser, contributions)
+                            contributors["postMode"].pop(f"{userID}", None)
                             bot.loop.create_task(sendNext(guildID, channelID, promptCode, turnLength))
                         bot.loop.create_task(promptUpdater(guildID, channelID))
                     timers[timer] = None
