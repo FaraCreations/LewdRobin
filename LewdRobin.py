@@ -9,6 +9,7 @@ import time
 import datetime
 import pytz
 import asyncio
+import socket
 
 # global variables
 intents = discord.Intents.default()
@@ -33,9 +34,10 @@ bot = discord.Client(Intents=intents)
 ap = os.path.abspath
 dname = os.path.dirname(ap(__file__))
 initialize = {}
+initialize["on_ready"] = False
 initialize["guildCommands"] = True
 initialize["globalCommands"] = True
-botToken = "yourToken"
+botToken = "put yourToken here"
 headers = {"Authorization": f"Bot {botToken}"}
 promptReminder = "\n*Reactions: :white_check_mark: join this prompt; :x: drop from the prompt; :play_pause: pause or resume the prompt;  :arrows_counterclockwise: generate a new prompt; :question: open the help menu.*"
 listEnvironments = []
@@ -1931,39 +1933,46 @@ def displaySettings(guildID, channelID, channelName):
             displayPlay += f"\n{setting.title()}: {data[0].title()}"
     return [displayGen, displayEnv, displaySpecies, displayPlay]
 
+def is_connected():
+    try:
+        socket.create_connection(("1.1.1.1", 53))
+        return True
+    except OSError:
+        pass
+    return False
+
 #asyncio (async/await) functions
 @bot.event
 async def on_ready():
-    #x = requests.delete("https://discord.com/api/v8/applications/839249838972862535/commands/841091869890576384", headers = headers)
-    #x = requests.delete("https://discord.com/api/v8/applications/839249838972862535/guilds/840167542223667230/commands/842760919155212319", headers = headers)
-    #x = requests.delete("https://discord.com/api/v8/applications/839249838972862535/guilds/829205400037359636/commands/842760637502849026", headers = headers)
-    Interaction(bot)
-    listPopulator()
-    async for guild in bot.fetch_guilds():
-        if not os.path.isfile(f'{guild.id}.ini'):               
-            createGuildConfig(guild.id)
-        contributors[f"{guild.id}"] = {}
-        contributors[f"{guild.id}"]["banned"] = []
-        config = configparser.ConfigParser()
-        configPath = ap(f'{guild.id}.ini')
-        config.read(configPath)
-        reactableLister(guild.id)
-        for section in range(1, len(config.sections())):
-            channelID = config.sections()[section]
-            contributorsConfig(guild.id, channelID)
-    if initialize["globalCommands"]:
-        createGlobalCommands()
-        print("Initializing global commands")
-        initialize["globalCommands"] = False
-    if initialize["guildCommands"]:
-        print("Initializing guild commands")
+    if not initialize["on_ready"]:
+        Interaction(bot)
+        listPopulator()
         async for guild in bot.fetch_guilds():
-            createGuildCommands(guild.id)
-        else:
-            initialize["guildCommands"] = False
-    async for guild in bot.fetch_guilds():
-        guildIDList.append(guild.id)
-    print(f'We have logged in as {bot.user}!')
+            if not os.path.isfile(f'{guild.id}.ini'):               
+                createGuildConfig(guild.id)
+            contributors[f"{guild.id}"] = {}
+            contributors[f"{guild.id}"]["banned"] = []
+            config = configparser.ConfigParser()
+            configPath = ap(f'{guild.id}.ini')
+            config.read(configPath)
+            reactableLister(guild.id)
+            for section in range(1, len(config.sections())):
+                channelID = config.sections()[section]
+                contributorsConfig(guild.id, channelID)
+        if initialize["globalCommands"]:
+            createGlobalCommands()
+            print("Initializing global commands")
+            initialize["globalCommands"] = False
+        if initialize["guildCommands"]:
+            print("Initializing guild commands")
+            async for guild in bot.fetch_guilds():
+                createGuildCommands(guild.id)
+            else:
+                initialize["guildCommands"] = False
+        async for guild in bot.fetch_guilds():
+            guildIDList.append(guild.id)
+        initialize["on_ready"] = True
+        print(f'We have logged in as {bot.user}!')
 
 @bot.event
 async def on_guild_join(guild):
@@ -1976,6 +1985,17 @@ async def on_guild_join(guild):
     contributors[f"{guild.id}"]["banned"] = []
     guildIDList.append(guild.id)
     print(f"Joined {guild.name}.")
+
+async def can_message(user):
+  try:
+    await user.send()
+  except discord.errors.HTTPException as e:
+    if e.code == 50006:
+      return True
+    elif e.code == 50007:
+      return False
+    else:
+      raise
 
 async def promptUpdater(guildID, channelID):
     conChannel = contributors[f"{guildID}"][f"{channelID}"]
@@ -2421,6 +2441,10 @@ async def on_interaction(data):
             iHReply(iID, iToken, f"You need the {adminName} role to use this command.")
         return
     elif iName in ["join", "post", "pass", "drop"]:
+        user = await bot.fetch_user(userID)
+        if not await can_message(user):
+            iHReply(iID, iToken, "To participate in LewdRobin prompts, you need to enable direct messages from server members (User Settings -> Privacy & Safety)")
+            return
         promptCode = str(iOpt[0]["value"]).zfill(4)
         pData = codeChecker(promptCode)
         if not pData:
@@ -2505,6 +2529,10 @@ async def on_interaction(data):
             iHReply(iID, iToken, "You do not have permission to pause/unpause prompts on this server")
         return
     elif iName == "help":
+        user = await bot.fetch_user(userID)
+        if not await can_message(user):
+            iHReply(iID, iToken, "To view LewdRobin's help menu, you need to enable direct messages from server members (User Settings -> Privacy & Safety)")
+            return
         iHReply(iID, iToken, "Check your DMs for the help menu.")
         bot.loop.create_task(action_help(userID))
         return
@@ -2619,24 +2647,54 @@ async def on_raw_reaction_add(payload):
                 return
         if emoji == "🔄":
             if moderator:
+                user = await bot.fetch_user(userID)
+                if not await can_message(user):
+                    msg = await channel.send("To participate in LewdRobin prompts, you need to enable direct messages from server members (User Settings -> Privacy & Safety)")
+                    await msg.delete(delay = 15)
+                    for reaction in message.reactions:
+                        if reaction.emoji == "🔄" and inGuild:
+                            await reaction.remove(user)
+                    return
                 bot.loop.create_task(action_run(guildID, channelID, channel, None, None, isInteraction = False))
             for reaction in message.reactions:
                 if reaction.emoji == "🔄" and inGuild:
                     await reaction.remove(user)
             return
         if emoji == "❓":
+            user = await bot.fetch_user(userID)
+            if not await can_message(user):
+                msg = await channel.send("To view LewdRobin's help menu, you need to enable direct messages from server members (User Settings -> Privacy & Safety)")
+                await msg.delete(delay = 15)
+                for reaction in message.reactions:
+                    if reaction.emoji == "❓" and inGuild:
+                        await reaction.remove(user)
+                return
             bot.loop.create_task(action_help(userID))
             for reaction in message.reactions:
                 if reaction.emoji == "❓" and inGuild:
                     await reaction.remove(user)
             return
         if emoji == "✅":
+            if not await can_message(user):
+                msg = await channel.send("To participate in LewdRobin prompts, you need to enable direct messages from server members (User Settings -> Privacy & Safety)")
+                await msg.delete(delay = 15)
+                for reaction in message.reactions:
+                    if reaction.emoji == "✅" and inGuild:
+                        await reaction.remove(user)
+                return
             bot.loop.create_task(action_join(userID, promptCode, None, None, isInteraction=False))
             for reaction in message.reactions:
                 if reaction.emoji == "✅" and inGuild:
                     await reaction.remove(user)
             return
         if emoji == "❌":
+            if not await can_message(user):
+                msg = await channel.send("To participate in LewdRobin prompts, you need to enable direct messages from server members (User Settings -> Privacy & Safety)")
+                await msg.delete(delay = 15)
+                for reaction in message.reactions:
+                    if reaction.emoji == "❌" and inGuild:
+                        await reaction.remove(user)
+                return
             bot.loop.create_task(action_drop(userID, promptCode, None, None, None, isInteraction=False, isKick=False, isBan=False))
             for reaction in message.reactions:
                 if reaction.emoji == "❌" and inGuild:
@@ -2657,45 +2715,46 @@ async def timer_loop():
     while True:
         await asyncio.sleep(60)
         now = ns()
-        for timer in timers:
-            time = timers[timer]["time"]
-            action = timers[timer]["action"]
-            guildID = timers[timer]["guildID"]
-            channelID = timers[timer]["channelID"]
-            promptCode = timers[timer]["promptCode"]
-            userID = timers[timer]["userID"]
-            contributions = timers[timer]["contributions"]
-            conChannel = contributors[f"{guildID}"][f"{channelID}"]
-            pool = conChannel["pool"]
-            turn = conChannel["turn"]
-            if now > time:
-                turnLength = getConfigInt(guildID, channelID, "turn_length")
-                if action == "autopass":
-                    if contributions == conChannel["contributions"]:
-                        if dropUser(guildID, channelID, userID):
-                            user = await bot.fetch_user(userID)
-                            await user.send(f"You have been dropped from the contributor pool of prompt {promptCode} for inactivity.")
-                            if len(pool) < getConfigInt(guildID, channelID, "contributor_minimum"):
-                                for id in pool:
-                                    u = await bot.fetch_user(id)
-                                    await u.send(f"Prompt {promptCode} has dropped below the minimum required contributors and has paused. It will resume when sufficient contributors have joined.")
-                    else:
-                        position = pool.index(userID)
-                        if position >= turn:
-                            wait = position - turn
+        if is_connected():
+            for timer in timers:
+                time = timers[timer]["time"]
+                action = timers[timer]["action"]
+                guildID = timers[timer]["guildID"]
+                channelID = timers[timer]["channelID"]
+                promptCode = timers[timer]["promptCode"]
+                userID = timers[timer]["userID"]
+                contributions = timers[timer]["contributions"]
+                conChannel = contributors[f"{guildID}"][f"{channelID}"]
+                pool = conChannel["pool"]
+                turn = conChannel["turn"]
+                if now > time:
+                    turnLength = getConfigInt(guildID, channelID, "turn_length")
+                    if action == "autopass":
+                        if contributions == conChannel["contributions"]:
+                            if dropUser(guildID, channelID, userID):
+                                user = await bot.fetch_user(userID)
+                                await user.send(f"You have been dropped from the contributor pool of prompt {promptCode} for inactivity.")
+                                if len(pool) < getConfigInt(guildID, channelID, "contributor_minimum"):
+                                    for id in pool:
+                                        u = await bot.fetch_user(id)
+                                        await u.send(f"Prompt {promptCode} has dropped below the minimum required contributors and has paused. It will resume when sufficient contributors have joined.")
                         else:
-                            wait = len(pool) - (turn - position) - 1
-                        waitTime = wait*turnLength
-                        user = await bot.fetch_user(userID)
-                        await user.send(f"Your turn for prompt {promptCode} has automatically ended. It will be your turn in {wait} turns. Your next turn will begin in at most {waitTime} minutes.")
-                    contributors["postMode"].pop(f"{userID}", None)
-                    if len(pool) >= getConfigInt(guildID, channelID, 'contributor_minimum'):
-                        bot.loop.create_task(sendNext(guildID, channelID, promptCode, turnLength))
-                    bot.loop.create_task(promptUpdater(guildID, channelID))
-                timers[timer] = None
-        forDeletion = [timer for timer in timers if timers[timer] == None]
-        for timer in forDeletion:
-            del timers[timer]
+                            position = pool.index(userID)
+                            if position >= turn:
+                                wait = position - turn
+                            else:
+                                wait = len(pool) - (turn - position) - 1
+                            waitTime = wait*turnLength
+                            user = await bot.fetch_user(userID)
+                            await user.send(f"Your turn for prompt {promptCode} has automatically ended. It will be your turn in {wait} turns. Your next turn will begin in at most {waitTime} minutes.")
+                        contributors["postMode"].pop(f"{userID}", None)
+                        if len(pool) >= getConfigInt(guildID, channelID, 'contributor_minimum'):
+                            bot.loop.create_task(sendNext(guildID, channelID, promptCode, turnLength))
+                        bot.loop.create_task(promptUpdater(guildID, channelID))
+                    timers[timer] = None
+            forDeletion = [timer for timer in timers if timers[timer] == None]
+            for timer in forDeletion:
+                del timers[timer]
          
 bot.loop.create_task(timer_loop())
 bot.run(botToken)
