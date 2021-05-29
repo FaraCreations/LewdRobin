@@ -37,7 +37,7 @@ initialize = {}
 initialize["on_ready"] = False
 initialize["guildCommands"] = True
 initialize["globalCommands"] = True
-botToken = "XXXXXXXX"
+botToken = "XXXXXX"
 headers = {"Authorization": f"Bot {botToken}"}
 promptReminder = "\n*Reactions: :white_check_mark: join this prompt; :x: drop from the prompt; :play_pause: pause or resume the prompt;  :arrows_counterclockwise: generate a new prompt; :question: open the help menu.*"
 listEnvironments = []
@@ -49,6 +49,7 @@ guildIDList = []
 pinMessages = {}
 contributors = {}
 timers = {}
+timersTemp = {}
 reactables = []
 os.chdir(dname)
 
@@ -1875,6 +1876,17 @@ def createTimer(time, action, guildID, channelID, promptCode, userID, contributi
                             "contributions": contributions 
                         }
 
+def createTimerTemp(time, action, guildID, channelID, promptCode, userID, contributions):
+    timersTemp[f"{time}"] = {
+                            "time": time, 
+                            "action": f"{action}", 
+                            "guildID": guildID, 
+                            "channelID": channelID,
+                            "promptCode": promptCode, 
+                            "userID": userID, 
+                            "contributions": contributions 
+                        }
+
 def nextTurn(guildID, channelID):
     conChannel = contributors[f"{guildID}"][f"{channelID}"]    
     conChannel["multipost"] = False
@@ -2217,10 +2229,9 @@ async def action_pass(userID, promptCode, iID, iToken, isInteraction, isDrop):
                 nextTime = ns() + 60000000000*turnLength
                 conChannel["timer"] = nextTime
                 nextUID = pool[conChannel["turn"]]
-                nextUser = await bot.fetch_user(nextUID)
                 if not isDrop:
                     bot.loop.create_task(replyOrSend(user, iID, iToken, isInteraction, f"You have ended your turn for prompt {promptCode}. It will be your turn in {wait} turns. Your next turn will begin in at most {waitTime} minutes."))               
-                createTimer(nextTime, "autopass", guildID, channelID, promptCode, nextUser, contributions)
+                createTimer(nextTime, "autopass", guildID, channelID, promptCode, nextUID, contributions)
                 contributors["postMode"].pop(f"{userID}", None)
                 reactables.remove(conChannel["postReactible"].id)
                 await conChannel["postReactible"].unpin()
@@ -2742,9 +2753,9 @@ async def timer_loop():
                         if contributions != conChannel["contributions"]:
                             position = pool.index(userID)
                             if position >= turn:
-                                wait = position - turn
+                                wait = position - turn + 1
                             else:
-                                wait = len(pool) - (turn - position) - 1
+                                wait = len(pool) - (turn - position) - 1 
                             waitTime = wait*turnLength
                             user = await bot.fetch_user(userID)
                             await user.send(f"Your turn for prompt {promptCode} has automatically ended. It will be your turn in {wait} turns. Your next turn will begin in at most {waitTime} minutes.")
@@ -2752,8 +2763,7 @@ async def timer_loop():
                             nextTime = ns() + 60000000000*turnLength
                             conChannel["timer"] = nextTime
                             nextUID = pool[conChannel["turn"]]
-                            nextUser = await bot.fetch_user(nextUID)
-                            createTimer(nextTime, "autopass", guildID, channelID, promptCode, nextUser, contributions)
+                            createTimerTemp(nextTime, "autopass", guildID, channelID, promptCode, nextUID, conChannel["contributions"])
                             contributors["postMode"].pop(f"{userID}", None)
                             bot.loop.create_task(sendNext(guildID, channelID, promptCode, turnLength))
                         bot.loop.create_task(promptUpdater(guildID, channelID))
@@ -2761,6 +2771,10 @@ async def timer_loop():
             forDeletion = [timer for timer in timers if timers[timer] == None]
             for timer in forDeletion:
                 del timers[timer]
+            global timersTemp
+            if timersTemp:
+                timers.update(timersTemp)
+                timersTemp = {}
          
 bot.loop.create_task(timer_loop())
 bot.run(botToken)
