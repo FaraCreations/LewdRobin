@@ -37,7 +37,7 @@ initialize = {}
 initialize["on_ready"] = False
 initialize["guildCommands"] = True
 initialize["globalCommands"] = True
-botToken = "put yourToken here"
+botToken = "XXXXXX"
 headers = {"Authorization": f"Bot {botToken}"}
 promptReminder = "\n*Reactions: :white_check_mark: join this prompt; :x: drop from the prompt; :play_pause: pause or resume the prompt;  :arrows_counterclockwise: generate a new prompt; :question: open the help menu.*"
 listEnvironments = []
@@ -179,7 +179,7 @@ def listPopulator():
     ld('a goblin', 'goblinoids').addTo(listCharacterSpecies)
     ld('a hobgoblin', 'goblinoids').addTo(listCharacterSpecies)
     ld('a bugbear', 'goblinoids').addTo(listCharacterSpecies)
-    ld('a mind flayer', 'illithids').addTo(listCharacterSpecies)
+    ld('a mind flayer', 'ilithids').addTo(listCharacterSpecies)
     ld('a slime', 'slimes').addTo(listCharacterSpecies)
     ld('an ooze', 'slimes').addTo(listCharacterSpecies)
     ld('a jelly', 'slimes').addTo(listCharacterSpecies)
@@ -189,7 +189,7 @@ def listPopulator():
     ld('a wood nymph', 'dryads').addTo(listCharacterSpecies)
     ld('a vine-sprouting dryad', 'dryads').addTo(listCharacterSpecies)
     ld('a harpy', 'harpies').addTo(listCharacterSpecies)
-    ld('a lamia', 'lamias').addTo(listCharacterSpecies)
+    ld('a lamia', 'lamia').addTo(listCharacterSpecies)
     ld('a centaur', 'centaurs').addTo(listCharacterSpecies)
     ld('a minotaur', 'minotaurs').addTo(listCharacterSpecies)
     ld('a hill giant', 'giants').addTo(listCharacterSpecies)
@@ -2748,6 +2748,7 @@ async def timer_loop():
                             user = await bot.fetch_user(userID)
                             await user.send(f"Your turn for prompt {promptCode} has automatically ended. It will be your turn in {wait} turns. Your next turn will begin in at most {waitTime} minutes.")
                         contributors["postMode"].pop(f"{userID}", None)
+                        nextTurn(guildID, channelID)
                         if len(pool) >= getConfigInt(guildID, channelID, 'contributor_minimum'):
                             bot.loop.create_task(sendNext(guildID, channelID, promptCode, turnLength))
                         bot.loop.create_task(promptUpdater(guildID, channelID))
