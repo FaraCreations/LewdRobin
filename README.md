@@ -97,9 +97,18 @@ I spent a lot of time lovingly coding to make LewdRobin work. If you'd like to s
 <https://paypal.me/FaraCreations>
 
 # Change Log
+5/29/21 - LewdRobin 1.03
+ - Added missing nextTurn() function to the autopass timer
+
+5/28/21 - LewdRobin 1.02
+ - Added a check for whether users have guild DMs turned off
+ - Added a message for users who don't have guild DMs turned on
+ - Fixed related DM permissions bugs
+ - Added a connectivity check to the timer to prevent timers from generating errors if the server goes offline
 
 5/27/21 - LewdRobin 1.01
  - Fixed memory leak in promptGenerator
+ - Fixed errors when checking for permissions on non-server admin users
 
 5/26/21 - LewdRobin 1.0 
  - Initial Release
