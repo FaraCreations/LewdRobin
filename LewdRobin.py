@@ -692,7 +692,7 @@ def createGuildConfig(guildID):
     config.set('default', 'orcs', 'true')
     config.set('default', 'goliaths', 'true')
     config.set('default', 'goblinoids', 'false')
-    config.set('default', 'illithids', 'false')
+    config.set('default', 'ilithids', 'false')
     config.set('default', 'slimes', 'true')
     config.set('default', 'tentacles', 'true')
     config.set('default', 'dryads', 'true')
@@ -1982,7 +1982,7 @@ def displaySettings(guildID, channelID, channelName):
             displayEnv += f"\n{setting}: {data[0].title()} *(default)*"
         else:
             displayEnv += f"\n{setting}: {data[0].title()}"
-    settingsListSpecies = ['mammals', 'reptiles', 'fish', 'birds', 'insects', 'arachnids', 'humans', 'elves', 'dwarves', 'halflings', 'gnomes', 'tieflings', 'merfolk', 'orcs', 'goliaths', 'goblinoids', 'illithids', 'slimes', 'tentacles', 'dryads', 'harpies', 'lamia', 'centaurs', 'minotaurs', 'giants', 'werebeasts', 'vampires', 'undead', 'demons', 'angels', 'faeries', 'cyborgs', 'androids', 'robots', 'humanoid_aliens', 'aliens']
+    settingsListSpecies = ['mammals', 'reptiles', 'fish', 'birds', 'insects', 'arachnids', 'humans', 'elves', 'dwarves', 'halflings', 'gnomes', 'tieflings', 'merfolk', 'orcs', 'goliaths', 'goblinoids', 'ilithids', 'slimes', 'tentacles', 'dryads', 'harpies', 'lamia', 'centaurs', 'minotaurs', 'giants', 'werebeasts', 'vampires', 'undead', 'demons', 'angels', 'faeries', 'cyborgs', 'androids', 'robots', 'humanoid_aliens', 'aliens']
     displaySpecies = f">>> **LewdRobin Character Species Settings for {channelName}**"
     for setting in settingsListSpecies:
         data = getConfigDisplay(guildID, channelID, setting)
@@ -2012,7 +2012,7 @@ def displayDMSettings(userID):
             displayGen += f"\n{setting}: {data[0]} *(default)*"
         else:
             displayGen += f"\n{setting}: {data[0]}"
-    settingsListSpecies = ['mammals', 'reptiles', 'fish', 'birds', 'insects', 'arachnids', 'humans', 'elves', 'dwarves', 'halflings', 'gnomes', 'tieflings', 'merfolk', 'orcs', 'goliaths', 'goblinoids', 'illithids', 'slimes', 'tentacles', 'dryads', 'harpies', 'lamia', 'centaurs', 'minotaurs', 'giants', 'werebeasts', 'vampires', 'undead', 'demons', 'angels', 'faeries', 'cyborgs', 'androids', 'robots', 'humanoid_aliens', 'aliens']
+    settingsListSpecies = ['mammals', 'reptiles', 'fish', 'birds', 'insects', 'arachnids', 'humans', 'elves', 'dwarves', 'halflings', 'gnomes', 'tieflings', 'merfolk', 'orcs', 'goliaths', 'goblinoids', 'ilithids', 'slimes', 'tentacles', 'dryads', 'harpies', 'lamia', 'centaurs', 'minotaurs', 'giants', 'werebeasts', 'vampires', 'undead', 'demons', 'angels', 'faeries', 'cyborgs', 'androids', 'robots', 'humanoid_aliens', 'aliens']
     displaySpecies = f">>> **LewdRobin Character Species Settings for Personal Generation**"
     for setting in settingsListSpecies:
         data = getConfigDMDisplay(userID, setting)
@@ -2562,7 +2562,7 @@ async def on_interaction(data):
         else:
             bot.loop.create_task(action_generate(guildID, channelID, userID, iChannel, iID, iToken, isInteraction=True))            
         return
-    elif iName in ["time", "categories", "character_types", "contributors", "environments", "play_number", "play_surreal", "play_vanilla", "species_anthros", "species_fantasy", "species_futuristic", "species_monster"]:
+    elif iName in ["time", "categories", "character_types", "contributors", "environments", "play_bdsm", "play_surreal", "play_vanilla", "species_anthros", "species_fantasy", "species_futuristic", "species_monster"]:
         if guildID:
             if admin:  
                 reply = commandConfigSetter(iOpt, guildID, iChannel)
