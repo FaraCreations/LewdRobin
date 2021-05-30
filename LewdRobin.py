@@ -12,6 +12,7 @@ import asyncio
 import socket
 
 # global variables
+botToken = "XXXXXX"
 intents = discord.Intents.default()
 intents.bans = False
 intents.emojis = True
@@ -37,7 +38,8 @@ initialize = {}
 initialize["on_ready"] = False
 initialize["guildCommands"] = True
 initialize["globalCommands"] = True
-botToken = "XXXXXX"
+initialize["deleteGlobalCommands"] = False
+initialize["deleteGuildCommands"] = False
 headers = {"Authorization": f"Bot {botToken}"}
 promptReminder = "\n*Reactions: :white_check_mark: join this prompt; :x: drop from the prompt; :play_pause: pause or resume the prompt;  :arrows_counterclockwise: generate a new prompt; :question: open the help menu.*"
 listEnvironments = []
@@ -51,6 +53,8 @@ contributors = {}
 timers = {}
 timersTemp = {}
 reactables = []
+DMConfigDefault = {'environments': True, 'characters': True, 'scenes': True, 'play': True, 'character_number': 4, 'play_number': 4, 'japan': True, 'europe': True, 'america': True, 'historical': True, 'modern': True, 'futuristic': True, 'fantasy': True, 'cis_men': True, 'cis_women': True, 'nonbinary': True, 'trans_men': True, 'trans_women': True, 'futanari': True, 'mammals': True, 'reptiles': True, 'fish': False, 'birds': False, 'insects': False, 'arachnids': False, 'humans': True, 'elves': True, 'dwarves': True, 'halflings': True, 'gnomes': False, 'tieflings': True, 'merfolk': True, 'orcs': True, 'goliaths': True, 'goblinoids': False, 'ilithids': False, 'slimes': True, 'tentacles': True, 'dryads': True, 'harpies': False, 'lamia': False, 'centaurs': False, 'minotaurs': False, 'giants': False, 'werebeasts': True, 'vampires': True, 'undead': False, 'demons': True, 'angels': True, 'faeries': True, 'cyborgs': True, 'androids': True, 'robots': False, 'humanoid_aliens': True, 'aliens': False, 'urban': True, 'rural': True, 'college': True, 'magical': True, 'tech': True, 'romance': True, 'kissing': True, 'cuddling': True, 'petting': True, 'grinding': True, 'titjobs': True, 'ass_play': True, 'anal_sex': True, 'manual_sex': True, 'oral_sex': True, 'intercrural_sex': True, 'penetrative_sex': True, 'basic_toys': True, 'age_play': False, 'bondage': False, 'biting': False, 'breast_play': False, 'impact_play': False, 'orgasm_control': False, 'genitorture': False, 'cuckoldry': False, 'cupping': False, 'dom_and_sub': False, 'knife_play': False, 'electro_play': False, 'food_play': False, 'temperature_play': False, 'fire_play': False, 'fisting': False, 'foot_play': False, 'degradation': False, 'exhibition': False, 'pet_play': False, 'piss_play': False, 'consensual_nonconsent': False, 'sensory_deprivation': False, 'sounding': False, 'intoxicants': False, 'incest': False, 'bestiality': False, 'size_play': False, 'partial_growth': False, 'extreme_insertions': False, 'inflation': False, 'transformation': False, 'impregnation': False, 'oviposition': False, 'dubious_consent': False, 'nonconsent': False, 'torture': False, 'gore': False, 'soft_vore': False, 'hard_vore': False, 'snuff': False, 'necrophilia': False}
+DMConfig = {}
 os.chdir(dname)
 
 #classes
@@ -274,7 +278,7 @@ def listPopulator():
     ld('dark alley, Tavern District', 'historical').addTo(listScenes)
     ld('conscripted into militia, Ironspike Garrison', 'historical').addTo(listScenes)
     ld('summoned for royal feast, Grand Hall, Ebongold Palace', 'historical').addTo(listScenes)
-    playList = ['cuddling', 'petting', 'grinding', 'titjob', 'ass_play', 'anal_sex', 'manual_sex', 'oral_sex', 'intercrural_sex', 'penetrative_sex', 'age_play', 'bondage', 'biting', 'breast_play', 'orgasm_control', 'genitorture', 'cuckoldry', 'cupping', 'dom_and_sub', 'knife_play', 'electro_play', 'food_play', 'temperature_play', 'fire_play', 'fisting', 'foot_play', 'degradation', 'exhibition', 'pet_play', 'piss_play', 'consensual_nonconsent', 'sensory_deprivation', 'sounding', 'intoxicants', 'incest', 'bestiality', 'size_play', 'partial_growth', 'extreme_insertions', 'inflation', 'transformation', 'impregnation', 'oviposition', 'dubious_consent', 'nonconsent', 'torture', 'gore', 'soft_vore', 'hard_vore', 'snuff', 'necrophilia']
+    playList = ['cuddling', 'petting', 'grinding', 'titjobs', 'ass_play', 'anal_sex', 'manual_sex', 'oral_sex', 'intercrural_sex', 'penetrative_sex', 'age_play', 'bondage', 'biting', 'breast_play', 'orgasm_control', 'genitorture', 'cuckoldry', 'cupping', 'dom_and_sub', 'knife_play', 'electro_play', 'food_play', 'temperature_play', 'fire_play', 'fisting', 'foot_play', 'degradation', 'exhibition', 'pet_play', 'piss_play', 'consensual_nonconsent', 'sensory_deprivation', 'sounding', 'intoxicants', 'incest', 'bestiality', 'size_play', 'partial_growth', 'extreme_insertions', 'inflation', 'transformation', 'impregnation', 'oviposition', 'dubious_consent', 'nonconsent', 'torture', 'gore', 'soft_vore', 'hard_vore', 'snuff', 'necrophilia']
     for pl in playList:
         ld(f'{pl.replace("_", " ")}', pl).addTo(listPlay)
     ld('handholding', 'romance').addTo(listPlay)
@@ -297,18 +301,6 @@ def listPopulator():
     ld('hitachi', 'basic_toys').addTo(listPlay)
     ld('fleshlights', 'basic_toys').addTo(listPlay)
 
-def getConfigInt(guildID, channelID, configName):
-    config = configparser.ConfigParser()
-    configPath = ap(f'{guildID}.ini')
-    config.read(configPath)
-    if f'{channelID}' in config.sections():
-        if configName in config[f'{channelID}']:
-            return config[f'{channelID}'].getint(configName)
-        else:
-            return config['default'].getint(configName)
-    else: 
-        return config['default'].getint(configName)
-
 def getConfig(guildID, channelID, configName):
     config = configparser.ConfigParser()
     configPath = ap(f'{guildID}.ini')
@@ -324,6 +316,18 @@ def getConfig(guildID, channelID, configName):
     except:
         return None
 
+def getConfigInt(guildID, channelID, configName):
+    config = configparser.ConfigParser()
+    configPath = ap(f'{guildID}.ini')
+    config.read(configPath)
+    if f'{channelID}' in config.sections():
+        if configName in config[f'{channelID}']:
+            return config[f'{channelID}'].getint(configName)
+        else:
+            return config['default'].getint(configName)
+    else: 
+        return config['default'].getint(configName)
+
 def getConfigBool(guildID, channelID, configName):
     config = configparser.ConfigParser()
     configPath = ap(f'{guildID}.ini')
@@ -335,6 +339,15 @@ def getConfigBool(guildID, channelID, configName):
             return config['default'].getboolean(configName) 
     else: 
         return config['default'].getboolean(configName)
+
+def getConfigDM(userID, configName):
+    if f"{userID}" in DMConfig:
+        if configName in DMConfig[f"{userID}"]:
+            return DMConfig[f"{userID}"][configName]
+        else:
+            return DMConfigDefault[configName]
+    else:
+        return DMConfigDefault[configName]
 
 def getConfigDisplay(guildID, channelID, configName):
     config = configparser.ConfigParser()
@@ -350,6 +363,15 @@ def getConfigDisplay(guildID, channelID, configName):
             return [config['default'][configName], True]
     except:
         return None
+
+def getConfigDMDisplay(userID, configName):
+    if f"{userID}" in DMConfig:
+        if configName in DMConfig[f"{userID}"]:
+            return [DMConfig[f"{userID}"][configName], False]
+        else:
+            return [DMConfigDefault[configName], True]
+    else:
+        return [DMConfigDefault[configName], True]
 
 def addConfig(guildID, channelID, configName, configValue):
     config = configparser.ConfigParser()
@@ -384,8 +406,12 @@ def reactableLister(guildID):
             reactables.append(getConfigInt(guildID, int(section), "promptid"))
         except:
             pass
+        try:
+            reactables.append(getConfigInt(guildID, int(section), "genid"))
+        except:
+            pass
 
-def promptGenerator(guildID, channelID):
+def promptGenerator(guildID, channelID, userID, addText):
     americaNames = {}
     japanNames = {}
     europeNames = {}
@@ -414,7 +440,7 @@ def promptGenerator(guildID, channelID):
     listExceptionsEnvironment = ["japan", "europe", "america", "historical", "modern", "futuristic", "fantasy"]
     listExceptionsCharacterTypes = ["cis_men", "cis_women", "nonbinary", "trans_men", "trans_women", "futanari"]
     listExceptionsCharacterSpecies = ['mammals', 'reptiles', 'fish', 'birds', 'insects', 'arachnids', 'humans', 'elves', 'dwarves', 'halflings', 'gnomes', 'tieflings', 'merfolk', 'orcs', 'goliaths', 'goblinoids', 'ilithids', 'slimes', 'tentacles', 'dryads', 'harpies', 'lamia', 'centaurs', 'minotaurs', 'giants', 'werebeasts', 'vampires', 'undead', 'demons', 'angels', 'faeries', 'cyborgs', 'androids', 'robots', 'humanoid_aliens', 'aliens']
-    listExceptionsPlay = ['romance', 'kissing', 'cuddling', 'petting', 'grinding', 'titjobs', 'ass', 'manual_sex', 'oral_sex', 'intercrural_sex', 'penetrative_sex', 'basic_toys', 'age_play', 'bondage', 'biting', 'breast_play', 'impact_play', 'orgasm_control', 'genitorture', 'cuckoldry', 'cupping', 'dom_and_sub', 'knife_play', 'electro_play', 'food_play', 'temperature_play', 'fire_play', 'fisting', 'foot_play', 'degradation', 'exhibition', 'pet_play', 'piss_play', 'consensual_nonconsent', 'sensory_deprivation', 'sounding', 'intoxicants', 'incest', 'bestiality', 'size_play', 'partial_growth', 'extreme_insertions', 'inflation', 'transformation', 'impregnation', 'oviposition', 'dubious_consent', 'nonconsent', 'torture', 'gore', 'soft_vore', 'hard_vore', 'snuff', 'necrophilia']
+    listExceptionsPlay = ['romance', 'kissing', 'cuddling', 'petting', 'grinding', 'titjobs', 'ass_play', 'manual_sex', 'oral_sex', 'intercrural_sex', 'penetrative_sex', 'basic_toys', 'age_play', 'bondage', 'biting', 'breast_play', 'impact_play', 'orgasm_control', 'genitorture', 'cuckoldry', 'cupping', 'dom_and_sub', 'knife_play', 'electro_play', 'food_play', 'temperature_play', 'fire_play', 'fisting', 'foot_play', 'degradation', 'exhibition', 'pet_play', 'piss_play', 'consensual_nonconsent', 'sensory_deprivation', 'sounding', 'intoxicants', 'incest', 'bestiality', 'size_play', 'partial_growth', 'extreme_insertions', 'inflation', 'transformation', 'impregnation', 'oviposition', 'dubious_consent', 'nonconsent', 'torture', 'gore', 'soft_vore', 'hard_vore', 'snuff', 'necrophilia']
     poolEnvironments = []
     poolCharacterTypes = []
     poolCharacterSpecies = []
@@ -433,143 +459,184 @@ def promptGenerator(guildID, channelID):
             listName[:] = [li for li in listName if not getLISection(li).getboolean(li)]        
         else:
             listName[:] = [li for li in listName if not config['default'].getboolean(li)]       
+    def exceptionTrimmerDM(listName):
+        if f"{userID}" in DMConfig:
+            def getLIDefault(li):
+                if li in DMConfig[f"{userID}"]:
+                    return DMConfig[f"{userID}"]
+                else:
+                    return DMConfigDefault
+            listName[:] = [li for li in listName if not getLIDefault(li)[li]]
+        else:
+            listName[:] = [li for li in listName if not DMConfigDefault[li]]
     def poolPopulator(listName, exceptionsName, poolName):
         for ld in listName:
             if not any(item in ld.tags for item in exceptionsName):
                 poolName.append(ld)
-    #try:
-    exceptionTrimmer(listExceptionsEnvironment)
-    exceptionTrimmer(listExceptionsCharacterTypes)
-    exceptionTrimmer(listExceptionsCharacterSpecies)
-    exceptionTrimmer(listExceptionsPlay)      
+    if guildID:
+        exceptionTrimmer(listExceptionsEnvironment)
+        exceptionTrimmer(listExceptionsCharacterTypes)
+        exceptionTrimmer(listExceptionsCharacterSpecies)
+        exceptionTrimmer(listExceptionsPlay)
+        playNumber = getConfigInt(guildID, channelID, "play_number")
+        characterNumber = getConfigInt(guildID, channelID, "character_number")
+        cisMen = getConfigBool(guildID, channelID, "cis_men")
+        cisWomen = getConfigBool(guildID, channelID, "cis_women")
+        humans = getConfigBool(guildID, channelID, "humans")
+    else:
+        exceptionTrimmerDM(listExceptionsEnvironment)
+        exceptionTrimmerDM(listExceptionsCharacterTypes)
+        exceptionTrimmerDM(listExceptionsCharacterSpecies)
+        exceptionTrimmerDM(listExceptionsPlay)
+        playNumber = getConfigDM(userID, "play_number")
+        characterNumber = getConfigDM(userID, "character_number")
+        cisMen = getConfigDM(userID, "cis_men")
+        cisWomen = getConfigDM(userID, "cis_women")
+        humans = getConfigDM(userID, "humans")
     poolPopulator(listEnvironments, listExceptionsEnvironment, poolEnvironments)
     poolPopulator(listCharacterTypes, listExceptionsCharacterTypes, poolCharacterTypes)
     poolPopulator(listCharacterSpecies, listExceptionsCharacterSpecies, poolCharacterSpecies)
     poolPopulator(listPlay, listExceptionsPlay, poolPlay)
-    playNumber = getConfigInt(guildID, channelID, "play_number")
-    characterNumber = getConfigInt(guildID, channelID, "character_number")
-    cisMen = getConfigBool(guildID, channelID, "cis_men")
-    cisWomen = getConfigBool(guildID, channelID, "cis_women")
-    if cisMen or cisWomen:
-        cisgenderBias = []
-        if cisMen:
-            cisgenderBias.append(ld('cis man', 'cis_men'))
-        if cisWomen:
-            cisgenderBias.append(ld('cis woman', 'cis_women'))
-        for cis in range(0, ceil(len(poolCharacterTypes)*1.6)):
-            poolCharacterTypes.append(random.choice(cisgenderBias))      
-    if getConfigBool(guildID, channelID, "humans"):
-        for hu in range(0, len(poolCharacterSpecies)):
-            poolCharacterSpecies.append(ld('a human', 'humans'))    
-    environment = random.choice(poolEnvironments)
-    for sce in listScenes:
-        if all(item in environment.tags for item in sce.tags):
-            poolScenes.append(sce) 
-    scene = random.choice(poolScenes)
-    characterText = []
-    for ct in range(0, characterNumber):
-        tempType = random.choice(poolCharacterTypes)
-        tempSpecies = random.choice(poolCharacterSpecies)
-        def nameFinder(type):
-            if "europe" in environment.tags:
-                n = random.randint(1,12)
-                if n > 4:
-                    return random.choice(europeNames[type])
-                if n == 4:
-                    return random.choice(americaNames[type])
-                if n == 3:
-                    return random.choice(japanNames[type])
-                if n == 2:
-                    return random.choice(fantasyNames[type])
-                if n == 1:
-                    return random.choice(futuristicNames[type])
-            elif "japan" in environment.tags:
-                n = random.randint(1,12)
-                if n > 4:
-                    return random.choice(japanNames[type])
-                if n == 4:
-                    return random.choice(americaNames[type])
-                if n == 3:
-                    return random.choice(europeNames[type])
-                if n == 2:
-                    return random.choice(fantasyNames[type])
-                if n == 1:
-                    return random.choice(futuristicNames[type])
-            elif "fantasy" in environment.tags and len(environment.tags) == 1:
-                n = random.randint(1,12)
-                if n > 4:
-                    return random.choice(fantasyNames[type])
-                if n == 4:
-                    return random.choice(americaNames[type])
-                if n == 3:
-                    return random.choice(japanNames[type])
-                if n == 2:
-                    return random.choice(europeNames[type])
-                if n == 1:
-                    return random.choice(futuristicNames[type])
-            elif "futuristic" in environment.tags and len(environment.tags) == 1:
-                n = random.randint(1,12)
-                if n > 4:
-                    return random.choice(futuristicNames[type])
-                if n == 4:
-                    return random.choice(americaNames[type])
-                if n == 3:
-                    return random.choice(japanNames[type])
-                if n == 2:
-                    return random.choice(fantasyNames[type])
-                if n == 1:
-                    return random.choice(europeNames[type])
+    try:
+        if cisMen or cisWomen:
+            cisgenderBias = []
+            if cisMen:
+                cisgenderBias.append(ld('cis man', 'cis_men'))
+            if cisWomen:
+                cisgenderBias.append(ld('cis woman', 'cis_women'))
+            for cis in range(0, ceil(len(poolCharacterTypes)*1.6)):
+                poolCharacterTypes.append(random.choice(cisgenderBias))      
+        if humans:
+            for hu in range(0, len(poolCharacterSpecies)):
+                poolCharacterSpecies.append(ld('a human', 'humans'))    
+        environment = random.choice(poolEnvironments)
+        for sce in listScenes:
+            if all(item in environment.tags for item in sce.tags):
+                poolScenes.append(sce) 
+        scene = random.choice(poolScenes)
+        characterText = []
+        for ct in range(0, characterNumber):
+            tempType = random.choice(poolCharacterTypes)
+            tempSpecies = random.choice(poolCharacterSpecies)
+            def nameFinder(type):
+                if "europe" in environment.tags:
+                    n = random.randint(1,12)
+                    if n > 4:
+                        return random.choice(europeNames[type])
+                    if n == 4:
+                        return random.choice(americaNames[type])
+                    if n == 3:
+                        return random.choice(japanNames[type])
+                    if n == 2:
+                        return random.choice(fantasyNames[type])
+                    if n == 1:
+                        return random.choice(futuristicNames[type])
+                elif "japan" in environment.tags:
+                    n = random.randint(1,12)
+                    if n > 4:
+                        return random.choice(japanNames[type])
+                    if n == 4:
+                        return random.choice(americaNames[type])
+                    if n == 3:
+                        return random.choice(europeNames[type])
+                    if n == 2:
+                        return random.choice(fantasyNames[type])
+                    if n == 1:
+                        return random.choice(futuristicNames[type])
+                elif "fantasy" in environment.tags and len(environment.tags) == 1:
+                    n = random.randint(1,12)
+                    if n > 4:
+                        return random.choice(fantasyNames[type])
+                    if n == 4:
+                        return random.choice(americaNames[type])
+                    if n == 3:
+                        return random.choice(japanNames[type])
+                    if n == 2:
+                        return random.choice(europeNames[type])
+                    if n == 1:
+                        return random.choice(futuristicNames[type])
+                elif "futuristic" in environment.tags and len(environment.tags) == 1:
+                    n = random.randint(1,12)
+                    if n > 4:
+                        return random.choice(futuristicNames[type])
+                    if n == 4:
+                        return random.choice(americaNames[type])
+                    if n == 3:
+                        return random.choice(japanNames[type])
+                    if n == 2:
+                        return random.choice(fantasyNames[type])
+                    if n == 1:
+                        return random.choice(europeNames[type])
+                else:
+                    n = random.randint(1,12)
+                    if n > 4:
+                        return random.choice(americaNames[type])
+                    if n == 4:
+                        return random.choice(europeNames[type])
+                    if n == 3:
+                        return random.choice(japanNames[type])
+                    if n == 2:
+                        return random.choice(fantasyNames[type])
+                    if n == 1:
+                        return random.choice(futuristicNames[type])
+            if tempType.text in ["cis man", "trans man"]:
+                tempFirstName = nameFinder("masc")
+            elif tempType.text in ["cis woman", "trans woman", "futanari"]:
+                tempFirstName = nameFinder("fem")
             else:
-                n = random.randint(1,12)
-                if n > 4:
-                    return random.choice(americaNames[type])
-                if n == 4:
-                    return random.choice(europeNames[type])
-                if n == 3:
-                    return random.choice(japanNames[type])
-                if n == 2:
-                    return random.choice(fantasyNames[type])
-                if n == 1:
-                    return random.choice(futuristicNames[type])
-        if tempType.text in ["cis man", "trans man"]:
-            tempFirstName = nameFinder("masc")
-        elif tempType.text in ["cis woman", "trans woman", "futanari"]:
-            tempFirstName = nameFinder("fem")
+                tempFirstName = nameFinder("neut")
+            tempSurName = nameFinder("sur")
+            characterText.append(f"\n*{tempFirstName} {tempSurName}:* {tempSpecies.text} {tempType.text}")
+        characterText = "".join(characterText)
+        if playNumber <= len(poolPlay):
+            playList = random.sample(poolPlay, playNumber)
         else:
-            tempFirstName = nameFinder("neut")
-        tempSurName = nameFinder("sur")
-        characterText.append(f"\n*{tempFirstName} {tempSurName}:* {tempSpecies.text} {tempType.text}")
-    characterText = "".join(characterText)
-    if playNumber <= len(poolPlay):
-        playList = random.sample(poolPlay, playNumber)
-    else:
-        playList = poolPlay
-    playText = []
-    for pl in playList:
-        playText.append(pl.text)
-    playText = ", ".join(playText)
-    promptCode = str(random.randint(1, 9999)).zfill(4)
-    conMin = getConfig(guildID, channelID, "contributor_minimum")
-    conMax = getConfig(guildID, channelID, "contributor_maximum")
-    promptText = ">>> **New Round-Robbin Writing Prompt**"
-    if getConfigBool(guildID, channelID, "environments"):
-        promptText += f"\n**Setting:** {environment.text}"
-    if getConfigBool(guildID, channelID, "characters"):
-        promptText += f"\n**Characters:** {characterText}"
-    if getConfigBool(guildID, channelID, "scenes"):
-        promptText += f"\n**Scene:** {scene.text}"
-    if getConfigBool(guildID, channelID, "play"):
-        promptText += f"\n**Play Suggestions:** {playText}"
-    promptText += f"\n**Prompt Code:** {promptCode}"
-    addConfig(guildID, channelID, "promptText", promptText)
-    promptConLine = f"\n**Contributors:** 0/{conMax} ({conMin} required)"
-    addConfig(guildID, channelID, "promptCode", promptCode)
-    addConfig(guildID, channelID, "promptContributions", 0)
-    contributorsConfig(guildID, channelID)
-    return promptText + promptConLine + promptReminder
-    #except:
-    #    return "Prompt generation failed. This happens on occasion. Press :arrows_counterclockwise: to try again. If generation continues to fail, make sure you have at least one item allowed from each prompt settings category."
-        
+            playList = poolPlay
+        playText = []
+        for pl in playList:
+            playText.append(pl.text)
+        playText = ", ".join(playText)
+        if addText:
+            promptText = ">>> **New Round-Robbin Writing Prompt**"
+        else:
+            promptText = ">>> **LewdRobin Writing Prompt**"
+        if guildID:
+            if getConfigBool(guildID, channelID, "environments"):
+                promptText += f"\n**Setting:** {environment.text}"
+            if getConfigBool(guildID, channelID, "characters"):
+                promptText += f"\n**Characters:** {characterText}"
+            if getConfigBool(guildID, channelID, "scenes"):
+                promptText += f"\n**Scene:** {scene.text}"
+            if getConfigBool(guildID, channelID, "play"):
+                promptText += f"\n**Play Suggestions:** {playText}"
+        else:
+            if getConfigDM(userID,  "environments"):
+                promptText += f"\n**Setting:** {environment.text}"
+            if getConfigDM(userID,  "characters"):
+                promptText += f"\n**Characters:** {characterText}"
+            if getConfigDM(userID,  "scenes"):
+                promptText += f"\n**Scene:** {scene.text}"
+            if getConfigDM(userID,  "play"):
+                promptText += f"\n**Play Suggestions:** {playText}"            
+        if not addText:
+            return promptText
+        else:
+            promptCode = str(random.randint(1, 9999)).zfill(4)
+            promptCodeLine = f"\n**Prompt Code:** {promptCode}"
+            addConfig(guildID, channelID, "promptText", promptText)
+            conMin = getConfig(guildID, channelID, "contributor_minimum")
+            conMax = getConfig(guildID, channelID, "contributor_maximum")
+            promptConLine = f"\n**Contributors:** 0/{conMax} ({conMin} required)"
+            addConfig(guildID, channelID, "promptCode", promptCode)
+            addConfig(guildID, channelID, "promptContributions", 0)
+            contributorsConfig(guildID, channelID)
+            return promptText + promptCodeLine + promptConLine + promptReminder
+    except:
+        if addText:
+            return "Prompt generation failed. This happens on occasion. Press :arrows_counterclockwise: to try again. If generation continues to fail, make sure you have at least one item allowed from each prompt settings category."
+        else:
+            return "Prompt generation failed. This happens on occasion. Press :arrows_clockwise: to try again. If generation continues to fail, make sure you have at least one item allowed from each prompt settings category."
+
 def createGuildConfig(guildID):
     config = configparser.ConfigParser()
     configPath = ap(f'{guildID}.ini')
@@ -655,7 +722,7 @@ def createGuildConfig(guildID):
     config.set('default', 'cuddling', 'true')
     config.set('default', 'petting', 'true')
     config.set('default', 'grinding', 'true')
-    config.set('default', 'titjob', 'true')
+    config.set('default', 'titjobs', 'true')
     config.set('default', 'ass_play', 'true')
     config.set('default', 'anal_sex', 'true')
     config.set('default', 'manual_sex', 'true')
@@ -705,6 +772,7 @@ def createGuildConfig(guildID):
     config.set('default', 'hard_vore', 'false')
     config.set('default', 'snuff', 'false')
     config.set('default', 'necrophilia', 'false')
+    config.set('default', 'genid', '0')
     with open(f'{guildID}.ini', 'w') as configfile:
         config.write(configfile)
 
@@ -723,7 +791,6 @@ def createGuildCommands(guildID):
     url = f"https://discord.com/api/v8/applications/{bot.user.id}/guilds/{guildID}/commands"
     g = requests.get(url, headers=headers)
     j = g.json()
-    url = f"https://discord.com/api/v8/applications/{bot.user.id}/guilds/{guildID}/commands"
 
     post = {
         "name": "roles",
@@ -816,51 +883,6 @@ def createGuildCommands(guildID):
     existsCheck(j, url, post)
 
     post = {
-        "name": "categories",
-        "description": "Toggle categories for prompt generation",
-        "type": 1,
-        "options": [
-            {
-                "name": "environments_on",
-                "description": "Whether prompts generate an environment",
-                "type": 5,
-                "required": False
-            },
-            {
-                "name": "characters_on",
-                "description": "Whether prompts generate characters",
-                "type": 5,
-                "required": False
-            },
-            {
-                "name": "character_number",
-                "description": "How many characters a prompt generates",
-                "type": 4,
-                "required": False,
-            },
-            {
-                "name": "scenes_on",
-                "description": "Whether prompts generate a starting scene",
-                "type": 5,
-                "required": False
-            },
-            {
-                "name": "play_on",
-                "description": "Whether prompts generate play type suggestions",
-                "type": 5,
-                "required": False
-            },
-            {
-                "name": "play_number",
-                "description": "How many characters a prompt generates",
-                "type": 4,
-                "required": False,
-            },
-        ],
-    }
-    existsCheck(j, url, post)
-
-    post = {
         "name": "contributors",
         "description": "Toggle options related to contributors",
         "type": 1,
@@ -882,6 +904,205 @@ def createGuildCommands(guildID):
                 "description": "The maximum number of contributors a prompt will accept. default: 10",
                 "type": 4,
                 "required": False
+            },
+        ],
+    }
+    existsCheck(j, url, post)                 
+
+    post = {
+        "name": "run",
+        "description": "Run a prompt now."
+    }
+    existsCheck(j, url, post)
+
+    post = {
+        "name": "kick",
+        "description": "Kicks a contributor from a prompt and prevents them from rejoining.",
+        "options": [
+            {
+                "name": "user_alias",
+                "description": "enter the ColorAnimal alias of the user to kick",
+                "type": 3,
+                "required": True
+            },
+        ]
+    }
+    existsCheck(j, url, post)
+    
+    post = {
+        "name": "ban",
+        "description": "Bans someone. They will be unable to join prompts on this server.",
+        "options": [
+            {
+                "name": "user_alias",
+                "description": "enter the ColorAnimal alias of the user to kick",
+                "type": 3,
+                "required": True
+            },
+        ]
+    }
+    existsCheck(j, url, post)
+
+    post = {
+        "name": "unban_all",
+        "description": "Unbans all users banned from prompt participation.",
+        "options": [
+            {
+                "name": "confirmation",
+                "description": 'enter "unban" to confirm this command.',
+                "type": 3,
+                "required": True
+            },
+        ]
+    }
+    existsCheck(j, url, post)
+
+    post = {
+        "name": "pause",
+        "description": "Pause or unpause the prompt in this channel"
+    }
+    existsCheck(j, url, post)
+
+def createGlobalCommands():
+    url = f"https://discord.com/api/v8/applications/{bot.user.id}/commands"
+    g = requests.get(url, headers=headers)
+    j = g.json()
+
+    post = {
+        "name": "join",
+        "description": "Join the pool of round-robin contributors for a prompt",
+        "options": [
+            {
+                "name": "prompt_code",
+                "description": "enter the 4-digit code for the prompt",
+                "type": 4,
+                "required": True
+            },
+        ]
+    }
+    existsCheck(j, url, post)
+
+    post = {
+        "name": "drop",
+        "description": "Drop from a pool of contributors from a prompt",
+        "options": [
+            {
+                "name": "prompt_code",
+                "description": "enter the code of the prompt this is for",
+                "type": 4,
+                "required": True
+            }
+        ]
+    }
+    existsCheck(j, url, post)
+
+    post = {
+        "name": "post",
+        "description": "Submit a post for your current prompt",
+        "options": [
+            {
+                "name": "prompt_code",
+                "description": "enter the code of the prompt this is for",
+                "type": 4,
+                "required": True
+            },
+            {
+                "name": "text",
+                "description": "enter text of your post",
+                "type": 3,
+                "required": True
+            }
+        ]
+    }
+    existsCheck(j, url, post)
+
+    post = {
+        "name": "pass",
+        "description": "End your turn for submitting posts",
+        "options": [
+            {
+                "name": "prompt_code",
+                "description": "enter the code of the prompt this is for",
+                "type": 4,
+                "required": True
+            },
+        ]    
+    }
+    existsCheck(j, url, post)
+
+    post = {
+        "name": "help",
+        "description": "User guide, admin info, external links."
+    }
+    existsCheck(j, url, post)
+    
+    post = {
+        "name": "generate",
+        "description": "Generates a prompt (but does not run a story with it) in this channel."
+    }
+    existsCheck(j, url, post)    
+
+    post = {
+        "name": "reset",
+        "description": "Resets channel-specific settings for this channel",
+        "options": [
+            {
+                "name": "confirmation",
+                "description": 'enter "reset" to confirm this command.',
+                "type": 3,
+                "required": True
+            },
+        ]    
+    }
+    existsCheck(j, url, post)
+
+
+    post = {
+        "name": "display_settings",
+        "description": "Displaying this channel's settings (only you see it)"
+    }
+    existsCheck(j, url, post)
+
+    post = {
+        "name": "categories",
+        "description": "Toggle categories for prompt generation",
+        "type": 1,
+        "options": [
+            {
+                "name": "environments",
+                "description": "Whether prompts generate an environment",
+                "type": 5,
+                "required": False
+            },
+            {
+                "name": "characters",
+                "description": "Whether prompts generate characters",
+                "type": 5,
+                "required": False
+            },
+            {
+                "name": "character_number",
+                "description": "How many characters a prompt generates",
+                "type": 4,
+                "required": False,
+            },
+            {
+                "name": "scenes",
+                "description": "Whether prompts generate a starting scene",
+                "type": 5,
+                "required": False
+            },
+            {
+                "name": "play",
+                "description": "Whether prompts generate play type suggestions",
+                "type": 5,
+                "required": False
+            },
+            {
+                "name": "play_number",
+                "description": "How many characters a prompt generates",
+                "type": 4,
+                "required": False,
             },
         ],
     }
@@ -1239,45 +1460,6 @@ def createGuildCommands(guildID):
     }
     existsCheck(j, url, post)
 
-    {
-        "name": "scene",
-        "description": "Set scene types that can be generated",
-        "type": 1,
-        "options": [
-            {
-                "name": "urban",
-                "description": "Generate scenes involving urban themes and locations", 
-                "required": False,
-                "type": 5    
-            },
-            {
-                "name": "rural",
-                "description": "Generate scenes involving rural themes and locations", 
-                "required": False,
-                "type": 5    
-            },
-            {
-                "name": "college",
-                "description": "Generate scenes involving college themes and locaitons", 
-                "required": False,
-                "type": 5    
-            },
-            {
-                "name": "magical",
-                "description": "Generate scenes involving mystical or magical themes and locations", 
-                "required": False,
-                "type": 5    
-            },
-            {
-                "name": "hi-tech",
-                "description": "Generate scenes involving advanced technological themes and locaitons", 
-                "required": False,
-                "type": 5    
-            },
-        ]                
-    }
-    existsCheck(j, url, post)                  
-                    
     post = {
         "name": "play_vanilla",
         "description": "Set generatable types of non-kink play",
@@ -1314,7 +1496,7 @@ def createGuildCommands(guildID):
                 "type": 5
             },
             {
-                "name": "titjob",
+                "name": "titjobs",
                 "description": "phallus thrust between breasts",
                 "required": False,
                 "type": 5
@@ -1635,154 +1817,6 @@ def createGuildCommands(guildID):
     }
     existsCheck(j, url, post)
 
-    post = {
-        "name": "run",
-        "description": "Run a prompt now."
-    }
-    existsCheck(j, url, post)
-
-    post = {
-        "name": "kick",
-        "description": "Kicks a contributor from a prompt and prevents them from rejoining.",
-        "options": [
-            {
-                "name": "user_alias",
-                "description": "enter the ColorAnimal alias of the user to kick",
-                "type": 3,
-                "required": True
-            },
-        ]
-    }
-    existsCheck(j, url, post)
-    
-    post = {
-        "name": "ban",
-        "description": "Bans someone. They will be unable to join prompts on this server.",
-        "options": [
-            {
-                "name": "user_alias",
-                "description": "enter the ColorAnimal alias of the user to kick",
-                "type": 3,
-                "required": True
-            },
-        ]
-    }
-    existsCheck(j, url, post)
-
-    post = {
-        "name": "unban_all",
-        "description": "Unbans all users banned from prompt participation.",
-        "options": [
-            {
-                "name": "confirmation",
-                "description": 'enter "unban" to confirm this command.',
-                "type": 3,
-                "required": True
-            },
-        ]
-    }
-    existsCheck(j, url, post)
-
-    post = {
-        "name": "reset",
-        "description": "Resets channel-specific settings for this channel",
-        "options": [
-            {
-                "name": "confirmation",
-                "description": 'enter "reset" to confirm this command.',
-                "type": 3,
-                "required": True
-            },
-        ]    
-    }
-    existsCheck(j, url, post)
-
-    post = {
-        "name": "display_settings",
-        "description": "Creates a message displaying this channel's settings"
-    }
-    existsCheck(j, url, post)
-
-    post = {
-        "name": "pause",
-        "description": "Pause or unpause the prompt in this channel"
-    }
-    existsCheck(j, url, post)
-
-def createGlobalCommands():
-    url = f"https://discord.com/api/v8/applications/{bot.user.id}/commands"
-    g = requests.get(url, headers=headers)
-    j = g.json()
-
-    url = f"https://discord.com/api/v8/applications/{bot.user.id}/commands"
-    post = {
-        "name": "join",
-        "description": "Join the pool of round-robin contributors for a prompt",
-        "options": [
-            {
-                "name": "prompt_code",
-                "description": "enter the 4-digit code for the prompt",
-                "type": 4,
-                "required": True
-            },
-        ]
-    }
-    existsCheck(j, url, post)
-
-    post = {
-        "name": "drop",
-        "description": "Drop from a pool of contributors from a prompt",
-        "options": [
-            {
-                "name": "prompt_code",
-                "description": "enter the code of the prompt this is for",
-                "type": 4,
-                "required": True
-            }
-        ]
-    }
-    existsCheck(j, url, post)
-
-    post = {
-        "name": "post",
-        "description": "Submit a post for your current prompt",
-        "options": [
-            {
-                "name": "prompt_code",
-                "description": "enter the code of the prompt this is for",
-                "type": 4,
-                "required": True
-            },
-            {
-                "name": "text",
-                "description": "enter text of your post",
-                "type": 3,
-                "required": True
-            }
-        ]
-    }
-    existsCheck(j, url, post)
-
-    post = {
-        "name": "pass",
-        "description": "End your turn for submitting posts",
-        "options": [
-            {
-                "name": "prompt_code",
-                "description": "enter the code of the prompt this is for",
-                "type": 4,
-                "required": True
-            },
-        ]    
-    }
-    existsCheck(j, url, post)
-
-    post = {
-        "name": "help",
-        "description": "User guide, admin info, external links."
-    }
-    existsCheck(j, url, post)
-
 def addChannel(guildID, channelID):
     config = configparser.ConfigParser()
     configPath = ap(f'{guildID}.ini')
@@ -1813,6 +1847,14 @@ def iHReply(interactionID, interactionToken, message):
     }
     r = requests.post(url, json=post)
 
+def iHFollowup(interactionToken, message):
+    url = f"https://discord.com/api/v8/webhooks/{bot.user.id}/{interactionToken}"
+    post = {
+        "content": f"{message}",
+        "flags": 64
+    }
+    r = requests.post(url, json = post)
+
 def commandConfigSetter(options, guildID, channel):
     if len(options) > 0:
         optionNames = []
@@ -1824,6 +1866,17 @@ def commandConfigSetter(options, guildID, channel):
                 pass
         optionNames = ", ".join(optionNames)
     return f"The following channel-specific settings have been set for {channel.name}: {optionNames}.\nThese settings will override the corresponding default settings, but only for prompts generated in {channel.name}."
+
+def commandDMConfigSetter(options, userID):
+    if len(options) > 0:
+        optionNames = []
+        if f"{userID}" not in DMConfig:
+            DMConfig[f"{userID}"] = {}
+        for opt in range(0, len(options)):
+            DMConfig[f"{userID}"][f"{options[opt]['name']}"] = options[opt]["value"]
+            optionNames.append(options[opt]["name"].replace("_", " "))
+        optionNames = ", ".join(optionNames)
+    return f"The following settings have been set for private generation: {optionNames}.\nThese settings will override the corresponding default settings, but only for prompts generated in your DMs."
 
 def getAlias(guildID, channelID, userID):
     for key, value in contributors[f"{guildID}"][f"{channelID}"].items():
@@ -1915,35 +1968,69 @@ def displaySettings(guildID, channelID, channelName):
     displayGen = f">>> **LewdRobin General Settings for {channelName}**"
     for setting in settingsListGen:
         data = getConfigDisplay(guildID, channelID, setting)
+        setting = setting.replace("_", " ").title()
         if data[1]:
             displayGen += f"\n{setting}: {data[0]} *(default)*"
         else:
             displayGen += f"\n{setting}: {data[0]}"
-    settingsListEnv = ['japan', 'europe', 'america', 'historical', 'modern', 'futuristic', 'fantasy', 'men', 'women', 'nonbinary', 'trans_men', 'trans_women', 'futanari']
+    settingsListEnv = ['japan', 'europe', 'america', 'historical', 'modern', 'futuristic', 'fantasy', 'cis_men', 'cis_women', 'nonbinary', 'trans_men', 'trans_women', 'futanari']
     displayEnv = f">>> **LewdRobin Environment and Character Type Settings for {channelName}**"
     for setting in settingsListEnv:
         data = getConfigDisplay(guildID, channelID, setting)
+        setting = setting.replace("_", " ").title()
         if data[1]:
-            displayEnv += f"\n{setting.title()}: {data[0].title()} *(default)*"
+            displayEnv += f"\n{setting}: {data[0].title()} *(default)*"
         else:
-            displayEnv += f"\n{setting.title()}: {data[0].title()}"
+            displayEnv += f"\n{setting}: {data[0].title()}"
     settingsListSpecies = ['mammals', 'reptiles', 'fish', 'birds', 'insects', 'arachnids', 'humans', 'elves', 'dwarves', 'halflings', 'gnomes', 'tieflings', 'merfolk', 'orcs', 'goliaths', 'goblinoids', 'illithids', 'slimes', 'tentacles', 'dryads', 'harpies', 'lamia', 'centaurs', 'minotaurs', 'giants', 'werebeasts', 'vampires', 'undead', 'demons', 'angels', 'faeries', 'cyborgs', 'androids', 'robots', 'humanoid_aliens', 'aliens']
     displaySpecies = f">>> **LewdRobin Character Species Settings for {channelName}**"
     for setting in settingsListSpecies:
         data = getConfigDisplay(guildID, channelID, setting)
+        setting = setting.replace("_", " ").title()
         if data[1]:
-            displaySpecies += f"\n{setting.title()}: {data[0].title()} *(default)*"
+            displaySpecies += f"\n{setting}: {data[0].title()} *(default)*"
         else:
-            displaySpecies += f"\n{setting.title()}: {data[0].title()}"
-    settingsListPlay = ['romance', 'kissing', 'cuddling', 'petting', 'grinding', 'titjob', 'ass_play', 'anal_sex', 'manual_sex', 'oral_sex', 'intercrural_sex', 'penetrative_sex', 'basic_toys', 'age_play', 'bondage', 'biting', 'breast_play', 'impact_play', 'orgasm_control', 'genitorture', 'cuckoldry', 'cupping', 'dom_and_sub', 'knife_play', 'electro_play', 'food_play', 'temperature_play', 'fire_play', 'fisting', 'foot_play', 'degradation', 'exhibition', 'pet_play', 'piss_play', 'consensual_nonconsent', 'sensory_deprivation', 'sounding', 'intoxicants', 'incest', 'bestiality', 'size_play', 'partial_growth', 'extreme_insertions', 'inflation', 'transformation', 'impregnation', 'oviposition', 'dubious_consent', 'nonconsent', 'torture', 'gore', 'soft_vore', 'hard_vore', 'snuff', 'necrophilia']
+            displaySpecies += f"\n{setting}: {data[0].title()}"
+    settingsListPlay = ['romance', 'kissing', 'cuddling', 'petting', 'grinding', 'titjobs', 'ass_play', 'anal_sex', 'manual_sex', 'oral_sex', 'intercrural_sex', 'penetrative_sex', 'basic_toys', 'age_play', 'bondage', 'biting', 'breast_play', 'impact_play', 'orgasm_control', 'genitorture', 'cuckoldry', 'cupping', 'dom_and_sub', 'knife_play', 'electro_play', 'food_play', 'temperature_play', 'fire_play', 'fisting', 'foot_play', 'degradation', 'exhibition', 'pet_play', 'piss_play', 'consensual_nonconsent', 'sensory_deprivation', 'sounding', 'intoxicants', 'incest', 'bestiality', 'size_play', 'partial_growth', 'extreme_insertions', 'inflation', 'transformation', 'impregnation', 'oviposition', 'dubious_consent', 'nonconsent', 'torture', 'gore', 'soft_vore', 'hard_vore', 'snuff', 'necrophilia']
     displayPlay = f">>> **LewdRobin Play Settings for {channelName}**"
     for setting in settingsListPlay:
         data = getConfigDisplay(guildID, channelID, setting)
+        setting = setting.replace("_", " ").title()
         if data[1]:
-            displayPlay += f"\n{setting.title()}: {data[0].title()} *(default)*"
+            displayPlay += f"\n{setting}: {data[0].title()} *(default)*"
         else:
-            displayPlay += f"\n{setting.title()}: {data[0].title()}"
+            displayPlay += f"\n{setting}: {data[0].title()}"
     return [displayGen, displayEnv, displaySpecies, displayPlay]
+
+def displayDMSettings(userID):
+    settingsListGen = ['environments', 'characters', 'scenes', 'play', 'character_number', 'play_number', 'japan', 'europe', 'america', 'historical', 'modern', 'futuristic', 'fantasy', 'cis_men', 'cis_women', 'nonbinary', 'trans_men', 'trans_women', 'futanari']
+    displayGen = f">>> **LewdRobin General Settings for Personal Generation**"
+    for setting in settingsListGen:
+        data = getConfigDMDisplay(userID, setting)
+        setting = setting.replace("_", " ").title()
+        if data[1]:
+            displayGen += f"\n{setting}: {data[0]} *(default)*"
+        else:
+            displayGen += f"\n{setting}: {data[0]}"
+    settingsListSpecies = ['mammals', 'reptiles', 'fish', 'birds', 'insects', 'arachnids', 'humans', 'elves', 'dwarves', 'halflings', 'gnomes', 'tieflings', 'merfolk', 'orcs', 'goliaths', 'goblinoids', 'illithids', 'slimes', 'tentacles', 'dryads', 'harpies', 'lamia', 'centaurs', 'minotaurs', 'giants', 'werebeasts', 'vampires', 'undead', 'demons', 'angels', 'faeries', 'cyborgs', 'androids', 'robots', 'humanoid_aliens', 'aliens']
+    displaySpecies = f">>> **LewdRobin Character Species Settings for Personal Generation**"
+    for setting in settingsListSpecies:
+        data = getConfigDMDisplay(userID, setting)
+        setting = setting.replace("_", " ").title()
+        if data[1]:
+            displaySpecies += f"\n{setting}: {data[0]} *(default)*"
+        else:
+            displaySpecies += f"\n{setting}: {data[0]}"
+    settingsListPlay = ['romance', 'kissing', 'cuddling', 'petting', 'grinding', 'titjobs', 'ass_play', 'anal_sex', 'manual_sex', 'oral_sex', 'intercrural_sex', 'penetrative_sex', 'basic_toys', 'age_play', 'bondage', 'biting', 'breast_play', 'impact_play', 'orgasm_control', 'genitorture', 'cuckoldry', 'cupping', 'dom_and_sub', 'knife_play', 'electro_play', 'food_play', 'temperature_play', 'fire_play', 'fisting', 'foot_play', 'degradation', 'exhibition', 'pet_play', 'piss_play', 'consensual_nonconsent', 'sensory_deprivation', 'sounding', 'intoxicants', 'incest', 'bestiality', 'size_play', 'partial_growth', 'extreme_insertions', 'inflation', 'transformation', 'impregnation', 'oviposition', 'dubious_consent', 'nonconsent', 'torture', 'gore', 'soft_vore', 'hard_vore', 'snuff', 'necrophilia']
+    displayPlay = f">>> **LewdRobin Play Settings for Personal Generation**"
+    for setting in settingsListPlay:
+        data = getConfigDMDisplay(userID, setting)
+        setting = setting.replace("_", " ").title()
+        if data[1]:
+            displayPlay += f"\n{setting}: {data[0]} *(default)*"
+        else:
+            displayPlay += f"\n{setting}: {data[0]}"
+    return [displayGen, displaySpecies, displayPlay]
 
 def is_connected():
     try:
@@ -1971,6 +2058,13 @@ async def on_ready():
             for section in range(1, len(config.sections())):
                 channelID = config.sections()[section]
                 contributorsConfig(guild.id, channelID)
+        if initialize["deleteGlobalCommands"]:
+            url = f"https://discord.com/api/v8/applications/{bot.user.id}/commands"
+            p = requests.put(url, headers=headers, json={}) 
+        if initialize["deleteGuildCommands"]:
+            async for guild in bot.fetch_guilds():
+                url = f"https://discord.com/api/v8/applications/{bot.user.id}/guilds/{guild.id}/commands"
+                p = requests.put(url, headers=headers, json={})       
         if initialize["globalCommands"]:
             createGlobalCommands()
             print("Initializing global commands")
@@ -2060,7 +2154,7 @@ async def action_run(guildID, channelID, channel, iID, iToken, isInteraction):
         pass
     if isInteraction:
         iHReply(iID, iToken, "Generating a prompt. Give me a moment.")
-    msgRaw = promptGenerator(guildID, channelID)
+    msgRaw = promptGenerator(guildID, channelID, None, addText=True)
     msg = await channel.send(msgRaw)
     reactables.append(msg.id)
     addConfig(guildID, channelID, "promptID", msg.id)
@@ -2071,6 +2165,33 @@ async def action_run(guildID, channelID, channel, iID, iToken, isInteraction):
         await msg.pin()
     await msg.add_reaction("🔄")
     await msg.add_reaction("❓")    
+
+async def action_generate(guildID, channelID, userID, channel, iID, iToken, isInteraction):
+    if guildID:
+        genID = getConfigInt(guildID, channelID, "genid")
+        if genID:
+            reactables.remove(genID)
+    else:
+        if f"{userID}" in DMConfig:
+            if "genID" in DMConfig[f"{userID}"]:
+                genID = DMConfig[f"{userID}"]["genID"]
+                reactables.remove(genID)
+        else:
+            DMConfig[f"{userID}"] = {}   
+    if isInteraction:
+        iHReply(iID, iToken, "Generating a prompt using this channel's settings. This prompt will only be shown, not run. To create a story contributors can join, use /run.")
+    msg = promptGenerator(guildID, channelID, userID, addText=False)
+    if guildID:
+        message = await channel.send(msg)
+    else:
+        user = await bot.fetch_user(userID)
+        message = await user.send(msg)
+    reactables.append(message.id)
+    if guildID:
+        addConfig(guildID, channelID, "genid", f"{message.id}")
+    else:
+        DMConfig[f"{userID}"]["genID"] = message.id
+    await message.add_reaction("🔃")    
 
 async def action_join(userID, promptCode, iID, iToken, isInteraction):
     user = await bot.fetch_user(userID)
@@ -2358,33 +2479,32 @@ async def on_interaction(data):
         userID = int(data["user"]["id"])
     except:
         userID = int(data["member"]["user"]["id"])
-    try:
+    channelID = int(data["channel_id"])
+    iChannel = bot.get_channel(channelID)
+    if "guild_id" in data:
         guildID = int(data["guild_id"])
-        channelID = int(data["channel_id"])
         iGuild = bot.get_guild(guildID)
-        iChannel = bot.get_channel(channelID)
         member = await iGuild.fetch_member(userID)
         if member.guild_permissions.administrator:
             serverAdmin = True
         else:
             serverAdmin = False
-    except:
+    else:
         serverAdmin = False
+        guildID = None
+        iGuild = None
+        member = None
     try:
         iOpt = data["data"]["options"]
     except:
-        pass
-    try:
-        admin = getConfig(guildID, channelID, "admin")
-        moderator = getConfig(guildID, channelID, "moderator")
-    except:
-        admin = "none"
-        moderator = "none"
-    if admin != "none":
+        iOpt = None
+    admin = getConfig(guildID, channelID, "admin")
+    moderator = getConfig(guildID, channelID, "moderator")
+    if admin:
         adminName = iGuild.get_role(int(admin)).name
     else:
         adminName = "LewdRobin Admin"
-    if moderator != "none":
+    if moderator:
         moderatorName = iGuild.get_role(int(moderator)).name
     else:
         moderatorName = "LewdRobin Moderator"
@@ -2429,27 +2549,47 @@ async def on_interaction(data):
         else:
             iHReply(iID, iToken, f"You need the {moderatorName} role to use this command.")
         return
-    elif iName in ["time", "categories", "character_types", "contributors", "environments", "play_number", "play_surreal", "play_vanilla", "species_anthros", "species_fantasy", "species_futuristic", "species_monster"]:
-        if admin:  
-            reply = commandConfigSetter(iOpt, guildID, iChannel)
-            iHReply(iID, iToken, reply)
+    elif iName == "generate":
+        if guildID:
+            if moderator:
+                bot.loop.create_task(action_generate(guildID, channelID, userID, iChannel, iID, iToken, isInteraction=True))
+            else:
+                iHReply(iID, iToken, f"You need the {moderatorName} role to use this command.")                
         else:
-            iHReply(iID, iToken, f"You need the {adminName} role to use this command.")
+            bot.loop.create_task(action_generate(guildID, channelID, userID, iChannel, iID, iToken, isInteraction=True))            
+        return
+    elif iName in ["time", "categories", "character_types", "contributors", "environments", "play_number", "play_surreal", "play_vanilla", "species_anthros", "species_fantasy", "species_futuristic", "species_monster"]:
+        if guildID:
+            if admin:  
+                reply = commandConfigSetter(iOpt, guildID, iChannel)
+                iHReply(iID, iToken, reply)
+            else:
+                iHReply(iID, iToken, f"You need the {adminName} role to use this command.")
+        else:            
+            reply = commandDMConfigSetter(iOpt, userID)
+            iHReply(iID, iToken, reply)
         return
     elif iName == "reset":
-        if admin:
-            if iOpt[0]["value"] == "reset":
-                config = configparser.ConfigParser()
-                configPath = ap(f'{guildID}.ini')
-                config.read(configPath)
-                config[f'{channelID}'] = {}
-                with open(f'{guildID}.ini', 'w') as configfile:
-                    config.write(configfile)
-                iHReply(iID, iToken, f"Channel specific settings for{iChannel.name} have been reset. Using server defaults instead.")
+        if guildID:
+            if admin:
+                if iOpt[0]["value"] == "reset":
+                    config = configparser.ConfigParser()
+                    configPath = ap(f'{guildID}.ini')
+                    config.read(configPath)
+                    config[f'{channelID}'] = {}
+                    with open(f'{guildID}.ini', 'w') as configfile:
+                        config.write(configfile)
+                    iHReply(iID, iToken, f"Channel specific settings for{iChannel.name} have been reset. Using server defaults instead.")
+                else:
+                    iHReply(iID, iToken, f'You failed to properly confirm this command. Type "reset" in the confirmation if you really want to reset all configs in this channel.') 
             else:
-                iHReply(iID, iToken, f'You failed to properly confirm this command. Type "reset" in the confirmation if you really want to reset all configs in this channel.') 
+                iHReply(iID, iToken, f"You need the {adminName} role to use this command.")
         else:
-            iHReply(iID, iToken, f"You need the {adminName} role to use this command.")
+            if iOpt[0]["value"] == "reset":
+                DMConfig[f"{userID}"] = {}
+                iHReply(iID, iToken, "You have reset the settings for DM prompt generation to default")
+            else:
+                iHReply(iID, iToken, f'You failed to properly confirm this command. Type "reset" in the confirmation if you really want to reset all configs in this channel.')
         return
     elif iName in ["join", "post", "pass", "drop"]:
         user = await bot.fetch_user(userID)
@@ -2522,16 +2662,17 @@ async def on_interaction(data):
             iHReply(iID, iToken, f"You need the {adminName} role to kick contributors from LewdRobin prompts in this server.")
         return
     elif iName == "display_settings":
-        if admin:
+        if guildID:
             display = displaySettings(guildID, channelID, iChannel.name)
-            channel = await bot.fetch_channel(channelID)
-            iHReply(iID, iToken, "Displaying this channel's settings.")
-            await channel.send(display[0])
-            await channel.send(display[1])
-            await channel.send(display[2])
-            await channel.send(display[3])
+            iHReply(iID, iToken, display[0])
+            iHFollowup(iToken, display[1])
+            iHFollowup(iToken, display[2])
+            iHFollowup(iToken, display[3])
         else:
-            iHReply(iID, iToken, f"You need the {adminName} role to use this command.")
+            display = displayDMSettings(userID)
+            iHReply(iID, iToken, display[0])
+            iHFollowup(iToken, display[1])
+            iHFollowup(iToken, display[2])          
         return
     elif iName == "pause":
         if moderator:
@@ -2598,32 +2739,31 @@ async def on_raw_reaction_add(payload):
         channel = bot.get_channel(channelID)
         message = await channel.fetch_message(messageID)
         guildID = payload.guild_id
-        inGuild = False if guildID == None else True
-        try:     
-            guild = bot.get_guild(guildID)   
+        if guildID:
+            guild = bot.get_guild(guildID)
             member = await guild.fetch_member(userID)
             roles = [str(x.id) for x in member.roles]
             if member.guild_permissions.administrator:
                 serverAdmin = True
             else:
                 serverAdmin = False
-        except:
+        else:
             roles = []
             serverAdmin = False
-        try:
-            admin = getConfig(guildID, channelID, "admin")
-            moderator = getConfig(guildID, channelID, "moderator")
-        except:
-            admin = "none"
-            moderator = "none"
-        admin = True if admin in roles or serverAdmin else False
+            guild = None
+            member = None 
+        moderator = getConfig(guildID, channelID, "moderator")
+        if moderator:
+            moderatorName = guild.get_role(int(moderator)).name
+        else:
+            moderatorName = "LewdRobin Moderator"
         moderator = True if moderator in roles or serverAdmin else False
         try:
             promptCode = getConfig(guildID, channelID, "promptcode")
             promptCode = promptCode if promptCode else re.findall("rompt (\d\d\d\d)", message.content)[0]
         except:
             pass
-        if not inGuild:
+        if not guildID:
             if emoji == "▶️":
                 bot.loop.create_task(action_post(userID, promptCode, None, None, None, isInteraction=False))
                 return
@@ -2645,7 +2785,7 @@ async def on_raw_reaction_add(payload):
                 await user.send("**User Guide**\nAll of my user-facing features can be accessed either through slash commands or reactions. I'll list both ways in this guide.\n*Contributing to a prompt, step-by-step*\n**1.**  Make sure your server admins have invited me to their server, configured a channel for my prompts to play out in, and generated a prompt.\n**2.**  You can join my prompt by reacting to it with ✅ or by using the /join command along with the prompt's 4-digit code either in the server or in my DMs. Once you've joined, I'll DM you with the alias your contributions will be made under. However, the prompt may not immediately begin if it has fewer than the minimum required contributors (this count updates on the prompt message).\n**3.**  Contributing is turn-based, and each player gets 30 minutes (default) to contribute. I'll DM you when it's your turn. That DM will get pinned, and has a set of reacitons you can use to control your turn. If you need a refresher on the prompt, react with 📝 and I'll DM it to you. If you'd like some context, react with 📚 and I'll DM you the three most recent contributions to the prompt.\n**4.**  Now it's your turn to start contributing. You can do this in two ways. You can use the /post slash command with the prompt number and the text you'd like to post, either in the relevant server or my DMs. The easier way, however, is to react with ▶️ to enter Play Mode. Play Mode lasts the rest of your turn, and while you're in it, anything you DM me (except slash commands) will get posted as a contribution to the prompt.\n**5.**  Your turn will end automatically after its designated duration is over. You can end it early with ⏩ or /pass. You can also drop from the prompt at any time with ❌ (on the DM I sent you when your turn started or the prompt itself) or /drop. If you don't post a contribution or pass your turn within the time limit, you will be dropped from the prompt for inactivity.")
                 return
             if emoji == "🎊":
-                await user.send("**Admin Startup**\n*step-by-step guide to get me set up on your server*\n**1.**  Use this link to add me to your server:\n<https://discord.com/api/oauth2/authorize?client_id=839249838972862535&permissions=76864&scope=bot%20applications.commands>\nOnce you've added me to your server, I'll need a minute or two to set up slash commands.\n**2.**  Make a channel for my prompts to run in. I will need the `View Channel, Send Message, Add Reactions, Manage Messages, and Read Message History` permissions here. Potential contributors to the prompts I generate here should have the `View Channel, Add Reactions, Read Message History, and Use Slash Commands` permissions here. They should *not* have the `Send Messages` persmission in this channel.\n**3.**  Create LewdRobin Admin and Moderator roles. By default, only server admins can configure my settings or run prompts. If you want other members of your server to be able to do so, you will have to create roles for them. These will control who can use which slash and reaction commands in this server. These roles can be called anything, and don't need to grant any actual Discord permissions. Once you've created these roles, you will need to copy their IDs. To do this enable developer mode (User Settings -> Advanced -> Developer Mode) and right click on the roles in the role interface. Use the /roles command and paste in the role IDs for the IDs you want to be LewdRobin Admins and Moderators.\n*Admins* can configure, /display and /reset settings, /ban and /unban_all contributors.\n*Moderators* can /run prompts, /pause and resume prompts, and /kick contributors.\n**4.**  Configure settings. I use default settings to start with, but they can be fine-tuned for each channel I run prompts in. See 📊 Prompt Configuration for more info.")
+                await user.send("**Admin Startup**\n*step-by-step guide to get me set up on your server*\n**1.**  Use this link to add me to your server:\n[temporarily disabled until Lewd Robin has a stable host server]\nOnce you've added me to your server, I'll need a minute or two to set up slash commands.\n**2.**  Make a channel for my prompts to run in. I will need the `View Channel, Send Message, Add Reactions, Manage Messages, and Read Message History` permissions here. Potential contributors to the prompts I generate here should have the `View Channel, Add Reactions, Read Message History, and Use Slash Commands` permissions here. They should *not* have the `Send Messages` persmission in this channel.\n**3.**  Create LewdRobin Admin and Moderator roles. By default, only server admins can configure my settings or run prompts. If you want other members of your server to be able to do so, you will have to create roles for them. These will control who can use which slash and reaction commands in this server. These roles can be called anything, and don't need to grant any actual Discord permissions. Once you've created these roles, you will need to copy their IDs. To do this enable developer mode (User Settings -> Advanced -> Developer Mode) and right click on the roles in the role interface. Use the /roles command and paste in the role IDs for the IDs you want to be LewdRobin Admins and Moderators.\n*Admins* can configure, /display and /reset settings, /ban and /unban_all contributors.\n*Moderators* can /run prompts, /pause and resume prompts, and /kick contributors.\n**4.**  Configure settings. I use default settings to start with, but they can be fine-tuned for each channel I run prompts in. See 📊 Prompt Configuration for more info.")
                 return
             if emoji == "📊":
                 await user.send("**Prompt Configuration**\nThis will cover prompt settings configurable by people with the LewdRobin Admin role for your server. All settings have a server-wide default which is not (currently) modifiable. Any adjustments to settings are made on a channel-by-channel basis. Use /display_settings in a channel to create a message displaying its current settings. Modify settings with the commands listed below.\n**/Contributors**\n  turn_length – length in minutes of each contributor's turn\n  contributor_minimum – the minimum number of contributors a prompt needs before it can start\n  contributor_maximum – the most contributors a prompt can have at once\n**/categories**\n  [category]_on – whether prompts will generate this type of thing. At least one category must be turned on.\n  character_number – how many randomly generated characters will be created per prompt\n  play_number – how many play types will be generated per prompt\n**/environments**\nEnvironments and scenes both use these tags to determine the pool for generation. If any of an environment's tags are excluded here, it will be excluded; scenes are then drawn from a pool that matches the environment's tags.\n  [america/europe/japan] - environments set in this specific region\n  historical – environments set before 1980\n  modern – environments set between 1980 and 2030\n  futuristic – environments set after 2030\n  fantasy – environments with magical or fantasy-related elements\n**/character_types**\n  [type] – toggles whether this type of character is generated. If at least one of cis_men or cis_women are enabled, they will be given a weighted bias in the generation pool.\n**/species**\nIf humans are enabled, they will be given a weighted bias.\n  [species] – whether characters from this species group will be generated. May include multiple similar species.\n**/play**\n  [play type] – whether play recommendations from this activity group will be included. May include multiple similar activities.")
@@ -2659,66 +2799,86 @@ async def on_raw_reaction_add(payload):
         if emoji == "🔄":
             if moderator:
                 user = await bot.fetch_user(userID)
-                if not await can_message(user):
-                    msg = await channel.send("To participate in LewdRobin prompts, you need to enable direct messages from server members (User Settings -> Privacy & Safety)")
-                    await msg.delete(delay = 15)
-                    for reaction in message.reactions:
-                        if reaction.emoji == "🔄" and inGuild:
-                            await reaction.remove(user)
-                    return
                 bot.loop.create_task(action_run(guildID, channelID, channel, None, None, isInteraction = False))
-            for reaction in message.reactions:
-                if reaction.emoji == "🔄" and inGuild:
-                    await reaction.remove(user)
+            else:
+                msg = await channel.send(f"To run prompts in this channel, you need the {moderatorName} role.")
+                await msg.delete(delay = 15)
+            if guildID:
+                for reaction in message.reactions:
+                    if reaction.emoji == "🔄":
+                        await reaction.remove(user)
             return
         if emoji == "❓":
             user = await bot.fetch_user(userID)
             if not await can_message(user):
                 msg = await channel.send("To view LewdRobin's help menu, you need to enable direct messages from server members (User Settings -> Privacy & Safety)")
                 await msg.delete(delay = 15)
-                for reaction in message.reactions:
-                    if reaction.emoji == "❓" and inGuild:
-                        await reaction.remove(user)
+                if guildID:
+                    for reaction in message.reactions:
+                        if reaction.emoji == "❓":
+                            await reaction.remove(user)
                 return
             bot.loop.create_task(action_help(userID))
-            for reaction in message.reactions:
-                if reaction.emoji == "❓" and inGuild:
-                    await reaction.remove(user)
+            if guildID:
+                for reaction in message.reactions:
+                    if reaction.emoji == "❓":
+                        await reaction.remove(user)
             return
         if emoji == "✅":
             if not await can_message(user):
                 msg = await channel.send("To participate in LewdRobin prompts, you need to enable direct messages from server members (User Settings -> Privacy & Safety)")
                 await msg.delete(delay = 15)
-                for reaction in message.reactions:
-                    if reaction.emoji == "✅" and inGuild:
-                        await reaction.remove(user)
+                if guildID:
+                    for reaction in message.reactions:
+                        if reaction.emoji == "✅":
+                            await reaction.remove(user)
                 return
             bot.loop.create_task(action_join(userID, promptCode, None, None, isInteraction=False))
-            for reaction in message.reactions:
-                if reaction.emoji == "✅" and inGuild:
-                    await reaction.remove(user)
+            if guildID:
+                for reaction in message.reactions:
+                    if reaction.emoji == "✅":
+                        await reaction.remove(user)
             return
         if emoji == "❌":
             if not await can_message(user):
                 msg = await channel.send("To participate in LewdRobin prompts, you need to enable direct messages from server members (User Settings -> Privacy & Safety)")
                 await msg.delete(delay = 15)
-                for reaction in message.reactions:
-                    if reaction.emoji == "❌" and inGuild:
-                        await reaction.remove(user)
+                if guildID:
+                    for reaction in message.reactions:
+                        if reaction.emoji == "❌":
+                            await reaction.remove(user)
                 return
             bot.loop.create_task(action_drop(userID, promptCode, None, None, None, isInteraction=False, isKick=False, isBan=False))
-            for reaction in message.reactions:
-                if reaction.emoji == "❌" and inGuild:
-                    await reaction.remove(user)
+            if guildID:
+                for reaction in message.reactions:
+                    if reaction.emoji == "❌":
+                        await reaction.remove(user)
             return   
         if emoji == "⏯":
             if moderator:
                 bot.loop.create_task(action_pause(guildID, channelID, None, None, isInteraction=False))
-            for reaction in message.reactions:
-                if reaction.emoji == "⏯" and inGuild:
-                    await reaction.remove(user)
+            else:
+                msg = await channel.send(f"To pause/resume prompts in this channel, you need a {moderatorName} role.")
+                await msg.delete(delay = 15)
+            if guildID:
+                for reaction in message.reactions:
+                    if reaction.emoji == "⏯":
+                        await reaction.remove(user)
             return
-        if inGuild:
+        if emoji == "🔃":
+            if guildID:
+                if moderator:
+                    bot.loop.create_task(action_generate(guildID, channelID, userID, channel, None, None, isInteraction=False))
+                else:
+                    msg = await channel.send(f"To generate prompts here, you need the {moderatorName} role. You can generate prompts privately by DMing me /generate, though!")
+                    await msg.delete(delay = 15)
+                for reaction in message.reactions:
+                        if reaction.emoji == "🔃":
+                            await reaction.remove(user)
+            else:
+                bot.loop.create_task(action_generate(guildID, channelID, userID, channel, None, None, isInteraction=False))
+            return
+        if guildID:
             for reaction in message.reactions:
                 await reaction.remove(user)
 
@@ -2740,7 +2900,7 @@ async def timer_loop():
                 turn = conChannel["turn"]
                 if now > time:
                     turnLength = getConfigInt(guildID, channelID, "turn_length")
-                    if action == "autopass":
+                    if action == "autopassDISABLED":
                         if contributions == conChannel["contributions"]:
                             if dropUser(guildID, channelID, userID):
                                 user = await bot.fetch_user(userID)
