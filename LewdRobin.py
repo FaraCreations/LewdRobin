@@ -36,10 +36,10 @@ ap = os.path.abspath
 dname = os.path.dirname(ap(__file__))
 initialize = {}
 initialize["on_ready"] = False
-initialize["guildCommands"] = True
-initialize["globalCommands"] = True
-initialize["deleteGlobalCommands"] = True
-initialize["deleteGuildCommands"] = True
+initialize["guildCommands"] = False
+initialize["globalCommands"] = False
+initialize["deleteGlobalCommands"] = False
+initialize["deleteGuildCommands"] = False
 headers = {"Authorization": f"Bot {botToken}"}
 promptReminder = "\n*Reactions: :white_check_mark: join this prompt; :x: drop from the prompt; :play_pause: pause or resume the prompt;  :arrows_counterclockwise: generate a new prompt; :question: open the help menu.*"
 listEnvironments = []
@@ -2500,6 +2500,10 @@ async def on_interaction(data):
         iOpt = None
     admin = getConfig(guildID, channelID, "admin")
     moderator = getConfig(guildID, channelID, "moderator")
+    if admin == "none":
+        admin = None
+    if moderator == "none":
+        moderator = None
     if admin:
         adminName = iGuild.get_role(int(admin)).name
     else:
@@ -2753,6 +2757,8 @@ async def on_raw_reaction_add(payload):
             guild = None
             member = None 
         moderator = getConfig(guildID, channelID, "moderator")
+        if moderator == "none":
+            moderator = None
         if moderator:
             moderatorName = guild.get_role(int(moderator)).name
         else:
