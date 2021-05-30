@@ -97,6 +97,12 @@ I spent a lot of time lovingly coding to make LewdRobin work. If you'd like to s
 <https://paypal.me/FaraCreations>
 
 # Change Log
+5/30/21 - LewdRobin 1.04
+ - New /generate feature allows private generation of prompts and private prompt setting configuration
+ - Persistent bugs in the autopass timer require it being temporarily disabled
+ - Added additional permisison notification to restricted reactions
+ - Temporarily removed link from admin startup help
+
 5/29/21 - LewdRobin 1.03
  - Added missing nextTurn() function to the autopass timer
 
