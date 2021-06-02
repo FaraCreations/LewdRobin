@@ -20,12 +20,14 @@ All of LewdRobin's user-facing features can be accessed either through slash com
 
 **5.**  Your turn will end automatically after its designated duration is over. You can end it early with ⏩ or /pass. You can also drop from the prompt at any time with ❎ (on the DM LewdRobin sent you when your turn started or the prompt itself) or /drop. If you don't post a contribution or pass your turn within the time limit, you will be dropped from the prompt for inactivity.
 
+If you'd like to toy with prompt generation, you can use /generate in my DMs and set up generation settings in our private channel.
+
 ## Admin Startup
 *step-by-step guide to get LewdRobin set up on your server*
 
 **1.**  Use this link to add LewdRobin to your server:
 
-<https://discord.com/api/oauth2/authorize?client_id=839249838972862535&permissions=76864&scope=bot%20applications.commands>
+\[Link Removed until Lewd Robin has a stable hosting solution\]
 
 Once you've added LewdRobin to your server, the bot will need a minute or two to set up slash commands.
 
@@ -88,7 +90,7 @@ If humans are enabled, they will be given a weighted bias.
   
 ## Automation
 
-This feature is still under development, and the related /time command doesn't do anything (yet). Check back later. :)
+The full automation feature is still under development, and the related /time command doesn't do anything (yet). However, basic automation can be started with /autorun and stopped with /autorun_stop. It will let you generate new prompts in a channel at a regular period.
 
 ## Tip the Author
 
@@ -97,6 +99,13 @@ I spent a lot of time lovingly coding to make LewdRobin work. If you'd like to s
 <https://paypal.me/FaraCreations>
 
 # Change Log
+6/2/21 - LewdRobin 1.10
+ - Basic automation features implemented with /autorun and /autorun_stop
+ - File structure changed to keep configs and story logs in separate folders
+ - Story Logging implemented - prompts generate text files with the prompt info and a log of the story. These can be requested from the prompt with the 📜 reaction. This works even with older, concluded prompts.
+ - Prompt staging implemented: prompts now show if they are New, Active, or Concluded, and display different information and reactions accordingly.
+ - Prompts now conclude when a new prompt is generated in the chanel, or when the /conclude command is used. When a prompt concludes, if it had no contributions, it is deleted. If it has contributions, it enters an archival concldued mode. All posts tied to a concluded prompt get deleted (but the story can still be seen in the Story Log).
+
 5/30/21 - LewdRobin 1.04
  - New /generate feature allows private generation of prompts and private prompt setting configuration
  - Persistent bugs in the autopass timer require it being temporarily disabled
