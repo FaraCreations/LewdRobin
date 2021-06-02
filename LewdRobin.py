@@ -2,6 +2,7 @@ import discord
 import re
 import os
 import configparser
+from discord import channel
 import requests
 from math import ceil
 import random
@@ -31,9 +32,13 @@ UTC = pytz.utc
 dt = datetime
 dtt = datetime.datetime
 ns = time.time_ns
+nsMinute = 60000000000
 bot = discord.Client(Intents=intents)
 ap = os.path.abspath
-dname = os.path.dirname(ap(__file__))
+main = os.path.dirname(ap(__file__))
+promptLogs = f'{main}/promptLogs'
+serverConfigs = f'{main}/serverConfigs'
+task = bot.loop.create_task
 initialize = {}
 initialize["on_ready"] = False
 initialize["guildCommands"] = False
@@ -41,7 +46,12 @@ initialize["globalCommands"] = False
 initialize["deleteGlobalCommands"] = False
 initialize["deleteGuildCommands"] = False
 headers = {"Authorization": f"Bot {botToken}"}
+promptHeader = ">>> **New LewdRobin Writing Prompt**"
+promptHeaderActive = ">>> **Active LewdRobin Writing Prompt**"
+promptHeaderCondluded = ">>> **LewdRobin Writing Prompt**"
 promptReminder = "\n*Reactions: :white_check_mark: join this prompt; :x: drop from the prompt; :play_pause: pause or resume the prompt;  :arrows_counterclockwise: generate a new prompt; :question: open the help menu.*"
+promptReminderActive = "\n*Reactions: :white_check_mark: join this prompt; :x: drop from the prompt; :play_pause: pause or resume the prompt;  :arrows_counterclockwise: generate a new prompt; :question: open the help menu; :scroll: show the story log*"
+promptReminderConcluded = "\n*Reactions: :question: open the help menu; :scroll: show the story log*"
 listEnvironments = []
 listCharacterTypes = []
 listCharacterSpecies = []
@@ -51,11 +61,20 @@ guildIDList = []
 pinMessages = {}
 contributors = {}
 timers = {}
-timersTemp = {}
-reactables = []
+tempTimers = {}
 DMConfigDefault = {'environments': True, 'characters': True, 'scenes': True, 'play': True, 'character_number': 4, 'play_number': 4, 'japan': True, 'europe': True, 'america': True, 'historical': True, 'modern': True, 'futuristic': True, 'fantasy': True, 'cis_men': True, 'cis_women': True, 'nonbinary': True, 'trans_men': True, 'trans_women': True, 'futanari': True, 'mammals': True, 'reptiles': True, 'fish': False, 'birds': False, 'insects': False, 'arachnids': False, 'humans': True, 'elves': True, 'dwarves': True, 'halflings': True, 'gnomes': False, 'tieflings': True, 'merfolk': True, 'orcs': True, 'goliaths': True, 'goblinoids': False, 'ilithids': False, 'slimes': True, 'tentacles': True, 'dryads': True, 'harpies': False, 'lamia': False, 'centaurs': False, 'minotaurs': False, 'giants': False, 'werebeasts': True, 'vampires': True, 'undead': False, 'demons': True, 'angels': True, 'faeries': True, 'cyborgs': True, 'androids': True, 'robots': False, 'humanoid_aliens': True, 'aliens': False, 'urban': True, 'rural': True, 'college': True, 'magical': True, 'tech': True, 'romance': True, 'kissing': True, 'cuddling': True, 'petting': True, 'grinding': True, 'titjobs': True, 'ass_play': True, 'anal_sex': True, 'manual_sex': True, 'oral_sex': True, 'intercrural_sex': True, 'penetrative_sex': True, 'basic_toys': True, 'age_play': False, 'bondage': False, 'biting': False, 'breast_play': False, 'impact_play': False, 'orgasm_control': False, 'genitorture': False, 'cuckoldry': False, 'cupping': False, 'dom_and_sub': False, 'knife_play': False, 'electro_play': False, 'food_play': False, 'temperature_play': False, 'fire_play': False, 'fisting': False, 'foot_play': False, 'degradation': False, 'exhibition': False, 'pet_play': False, 'piss_play': False, 'consensual_nonconsent': False, 'sensory_deprivation': False, 'sounding': False, 'intoxicants': False, 'incest': False, 'bestiality': False, 'size_play': False, 'partial_growth': False, 'extreme_insertions': False, 'inflation': False, 'transformation': False, 'impregnation': False, 'oviposition': False, 'dubious_consent': False, 'nonconsent': False, 'torture': False, 'gore': False, 'soft_vore': False, 'hard_vore': False, 'snuff': False, 'necrophilia': False}
 DMConfig = {}
-os.chdir(dname)
+
+#directory configuration
+os.chdir(main)
+try:
+    os.mkdir(promptLogs)
+except:
+    pass
+try:
+    os.mkdir(serverConfigs)
+except:
+    pass
 
 #classes
 class ld:
@@ -74,7 +93,7 @@ class Interaction:
         client._connection.parsers["INTERACTION_CREATE"] = self._function_runner
     def _function_runner(self, data):
         try:
-            bot.loop.create_task(on_interaction(data))
+            task(on_interaction(data))
         except:
             pass
 
@@ -303,7 +322,7 @@ def listPopulator():
 
 def getConfig(guildID, channelID, configName):
     config = configparser.ConfigParser()
-    configPath = ap(f'{guildID}.ini')
+    configPath = ap(f'{serverConfigs}\{guildID}.ini')
     config.read(configPath)
     try:
         if f'{channelID}' in config.sections():
@@ -318,7 +337,7 @@ def getConfig(guildID, channelID, configName):
 
 def getConfigInt(guildID, channelID, configName):
     config = configparser.ConfigParser()
-    configPath = ap(f'{guildID}.ini')
+    configPath = ap(f'{serverConfigs}\{guildID}.ini')
     config.read(configPath)
     if f'{channelID}' in config.sections():
         if configName in config[f'{channelID}']:
@@ -330,7 +349,7 @@ def getConfigInt(guildID, channelID, configName):
 
 def getConfigBool(guildID, channelID, configName):
     config = configparser.ConfigParser()
-    configPath = ap(f'{guildID}.ini')
+    configPath = ap(f'{serverConfigs}\{guildID}.ini')
     config.read(configPath)
     if f'{channelID}' in config.sections():
         if configName in config[f'{channelID}']:
@@ -351,7 +370,7 @@ def getConfigDM(userID, configName):
 
 def getConfigDisplay(guildID, channelID, configName):
     config = configparser.ConfigParser()
-    configPath = ap(f'{guildID}.ini')
+    configPath = ap(f'{serverConfigs}\{guildID}.ini')
     config.read(configPath)
     try:
         if f'{channelID}' in config.sections():
@@ -375,13 +394,29 @@ def getConfigDMDisplay(userID, configName):
 
 def addConfig(guildID, channelID, configName, configValue):
     config = configparser.ConfigParser()
-    configPath = ap(f'{guildID}.ini')
+    configPath = ap(f'{serverConfigs}\{guildID}.ini')
     config.read(configPath)
     if f'{channelID}' not in config.sections():
         config.add_section(f'{channelID}')
     config.set(f'{channelID}', f'{configName}', f'{configValue}')
-    with open(f'{guildID}.ini', 'w') as configfile:
+    with open(configPath, 'w') as configfile:
         config.write(configfile)
+
+def addReactable(messageID):
+    with open("reactables.txt", "a") as f:
+        f.write(f" {messageID}")
+
+def removeReactable(messageID):
+    with open("reactables.txt", "r") as f:
+        reactables = f.read()
+    reactables.replace(f" {messageID}", "")
+    with open("reactables.txt", "w") as f:
+        f.write(reactables)
+
+def getReactables():
+    with open("reactables.txt", "r") as f:
+        reactables = f.read().split()
+        return [int(id) for id in reactables]
 
 def contributorsConfig(guildID, channelID):
     contributors["postMode"] = {}
@@ -389,27 +424,13 @@ def contributorsConfig(guildID, channelID):
     conChannel = contributors[f"{guildID}"][f"{channelID}"]
     conChannel["pool"] = []
     conChannel["kicked"] = []
+    conChannel["posts"] = []
     conChannel["turn"] = 0
-    conChannel["contributions"] = 0
     conChannel["promptStarted"] = False
     conChannel["multipost"] = False
     conChannel["timer"] = 0
     conChannel["context"] = ["I couldn't find any previous posts for this prompt :(", None, None]
     conChannel["paused"] = False
-
-def reactableLister(guildID):
-    config = configparser.ConfigParser()
-    configPath = ap(f'{guildID}.ini')
-    config.read(configPath)
-    for section in config.sections():
-        try:
-            reactables.append(getConfigInt(guildID, int(section), "promptid"))
-        except:
-            pass
-        try:
-            reactables.append(getConfigInt(guildID, int(section), "genid"))
-        except:
-            pass
 
 def promptGenerator(guildID, channelID, userID, addText):
     americaNames = {}
@@ -448,7 +469,7 @@ def promptGenerator(guildID, channelID, userID, addText):
     poolPlay = []
     def exceptionTrimmer(listName):
         config = configparser.ConfigParser()
-        configPath = ap(f'{guildID}.ini')
+        configPath = ap(f'{serverConfigs}\{guildID}.ini')
         config.read(configPath)
         if f'{channelID}' in config.sections():
             def getLISection(li):
@@ -596,10 +617,7 @@ def promptGenerator(guildID, channelID, userID, addText):
         for pl in playList:
             playText.append(pl.text)
         playText = ", ".join(playText)
-        if addText:
-            promptText = ">>> **New Round-Robbin Writing Prompt**"
-        else:
-            promptText = ">>> **LewdRobin Writing Prompt**"
+        promptText = ""
         if guildID:
             if getConfigBool(guildID, channelID, "environments"):
                 promptText += f"\n**Setting:** {environment.text}"
@@ -619,7 +637,8 @@ def promptGenerator(guildID, channelID, userID, addText):
             if getConfigDM(userID,  "play"):
                 promptText += f"\n**Play Suggestions:** {playText}"            
         if not addText:
-            return promptText
+            text = f">>> **LewdRobin Writing Prompt**{promptText}"
+            return [text, True]
         else:
             promptCode = str(random.randint(1, 9999)).zfill(4)
             promptCodeLine = f"\n**Prompt Code:** {promptCode}"
@@ -630,20 +649,25 @@ def promptGenerator(guildID, channelID, userID, addText):
             addConfig(guildID, channelID, "promptCode", promptCode)
             addConfig(guildID, channelID, "promptContributions", 0)
             contributorsConfig(guildID, channelID)
-            return promptText + promptCodeLine + promptConLine + promptReminder
+            text = promptHeader + promptText + promptCodeLine + promptConLine + promptReminder
+            return [text, True]
     except:
         if addText:
-            return "Prompt generation failed. This happens on occasion. Press :arrows_counterclockwise: to try again. If generation continues to fail, make sure you have at least one item allowed from each prompt settings category."
+            text = "Prompt generation failed. This happens on occasion. Press :arrows_counterclockwise: to try again. If generation continues to fail, make sure you have at least one item allowed from each prompt settings category."
+            return [text, False]
         else:
-            return "Prompt generation failed. This happens on occasion. Press :arrows_clockwise: to try again. If generation continues to fail, make sure you have at least one item allowed from each prompt settings category."
+            text = "Prompt generation failed. This happens on occasion. Press :arrows_clockwise: to try again. If generation continues to fail, make sure you have at least one item allowed from each prompt settings category."
+            return [text, False]
 
 def createGuildConfig(guildID):
     config = configparser.ConfigParser()
-    configPath = ap(f'{guildID}.ini')
+    configPath = ap(f'{serverConfigs}\{guildID}.ini')
     config.read(configPath)
     config.add_section('default')
     config.set('default', 'admin', 'none')
     config.set('default', 'moderator', 'none')
+    config.set('default', 'genid', '0')
+    config.set('default', 'concluded', '')
     config.set('default', 'start_time', 'None')
     config.set('default', 'interval', '0')
     config.set('default', 'runs', '0')
@@ -772,8 +796,7 @@ def createGuildConfig(guildID):
     config.set('default', 'hard_vore', 'false')
     config.set('default', 'snuff', 'false')
     config.set('default', 'necrophilia', 'false')
-    config.set('default', 'genid', '0')
-    with open(f'{guildID}.ini', 'w') as configfile:
+    with open(configPath, 'w') as configfile:
         config.write(configfile)
 
 def existsCheck(j, url, post):
@@ -960,6 +983,38 @@ def createGuildCommands(guildID):
     post = {
         "name": "pause",
         "description": "Pause or unpause the prompt in this channel"
+    }
+    existsCheck(j, url, post)
+
+    post = {
+        "name": "autorun",
+        "description": "Configure and begin automatic prompt generation.",
+        "options": [
+            {
+                "name": "interval",
+                "description": 'The number of minutes between automatic prompt generation.',
+                "type": 4,
+                "required": True
+            },
+            {
+                "name": "delay",
+                "description": 'The number of minutes before the first automatic prompt generation.',
+                "type": 4,
+                "required": True
+            }
+        ]
+    }
+    existsCheck(j, url, post)
+    
+    post = {
+        "name": "autorun_stop",
+        "description": "Stops automatic prompt generation (but not the current prompt)."
+    }
+    existsCheck(j, url, post)
+
+    post = {
+        "name": "conclude",
+        "description": "Concludes the active prompt in this channel"
     }
     existsCheck(j, url, post)
 
@@ -1819,11 +1874,11 @@ def createGlobalCommands():
 
 def addChannel(guildID, channelID):
     config = configparser.ConfigParser()
-    configPath = ap(f'{guildID}.ini')
+    configPath = ap(f'{serverConfigs}\{guildID}.ini')
     config.read(configPath)
     if f'{channelID}' not in config.sections():
             config.add_section(f'{channelID}')  
-            with open(f'{guildID}.ini', 'w') as configfile:
+            with open(configPath, 'w') as configfile:
                 config.write(configfile)
 
 def iReply(interactionID, interactionToken, message):
@@ -1929,8 +1984,8 @@ def createTimer(time, action, guildID, channelID, promptCode, userID, contributi
                             "contributions": contributions 
                         }
 
-def createTimerTemp(time, action, guildID, channelID, promptCode, userID, contributions):
-    timersTemp[f"{time}"] = {
+def createTempTimer(time, action, guildID, channelID, promptCode, userID, contributions):
+    tempTimers[f"{time}"] = {
                             "time": time, 
                             "action": f"{action}", 
                             "guildID": guildID, 
@@ -1951,7 +2006,7 @@ def codeChecker(promptCode):
     for guildID in guildIDList:
         try:
             config = configparser.ConfigParser()
-            configPath = ap(f'{guildID}.ini')
+            configPath = ap(f'{serverConfigs}\{guildID}.ini')
             config.read(configPath)
             sections = config.sections()
             for section in sections:
@@ -2040,21 +2095,36 @@ def is_connected():
         pass
     return False
 
+def logUpdater(guildID, channelID, promptCode, text):
+    fpath = f"{promptLogs}\{promptCode}.txt"
+    try:
+        with open(f"{fpath}", "x") as f:
+            promptText = getConfig(guildID, channelID, "prompttext")
+            f.write(f"{promptText}\n\n**Story:**")
+    except:
+        pass
+    with open(fpath, "a") as f:
+        f.write(f"\n{text}")
+
 #asyncio (async/await) functions
 @bot.event
 async def on_ready():
     if not initialize["on_ready"]:
         Interaction(bot)
         listPopulator()
+        try:
+            with open("reactables.txt", "x") as f:
+                f.write("")
+        except:
+            pass
         async for guild in bot.fetch_guilds():
-            if not os.path.isfile(f'{guild.id}.ini'):               
+            if not os.path.isfile(f'{serverConfigs}\{guild.id}.ini'):               
                 createGuildConfig(guild.id)
             contributors[f"{guild.id}"] = {}
             contributors[f"{guild.id}"]["banned"] = []
             config = configparser.ConfigParser()
-            configPath = ap(f'{guild.id}.ini')
+            configPath = ap(f'{serverConfigs}\{guild.id}.ini')
             config.read(configPath)
-            reactableLister(guild.id)
             for section in range(1, len(config.sections())):
                 channelID = config.sections()[section]
                 contributorsConfig(guild.id, channelID)
@@ -2085,7 +2155,7 @@ async def on_guild_join(guild):
     print("Initializing guild commands.")
     if initialize["guildCommands"]:
         createGuildCommands(guild.id)
-    if not os.path.isfile(f'{guild.id}.ini'):
+    if not os.path.isfile(f'{serverConfigs}\{guild.id}.ini'):
         createGuildConfig(guild.id)
     contributors[f"{guild.id}"] = {}
     contributors[f"{guild.id}"]["banned"] = []
@@ -2103,18 +2173,59 @@ async def can_message(user):
     else:
       raise
 
-async def promptUpdater(guildID, channelID):
+async def promptUpdater(guildID, channelID, promptCode):
     conChannel = contributors[f"{guildID}"][f"{channelID}"]
     conMin = getConfig(guildID, channelID, "contributor_minimum")
     conMax = getConfig(guildID, channelID, "contributor_maximum")
     conCurr = len(conChannel["pool"])
+    contributions = getConfigInt(guildID, channelID, "promptcontributions")
     promptText = getConfig(guildID, channelID, "promptText")
+    promptCodeLine = f"\n**Prompt Code:** {promptCode}"
     promptConLine = f"\n**Contributors:** {conCurr}/{conMax} ({conMin} required)"
-    promptPauseLine = "\n**PROMPT PAUSED**" if conChannel["paused"] else ""
+    promptConConcludeLine= f"\n**Contributions:** {contributions}"
+    promptPauseLine = "\n**PROMPT PAUSED**\n" if conChannel["paused"] else ""
     channel = await bot.fetch_channel(channelID)
     prompt = await channel.fetch_message(getConfigInt(guildID, channelID, "promptid"))
-    content = promptText + promptConLine + promptPauseLine + promptReminder
+    if f"{promptCode}" in getConfig(guildID, channelID, "concluded"):
+        content = "**PROMPT CONCLUDED**\n" + promptHeaderCondluded + promptText + promptCodeLine + promptConConcludeLine + promptReminderConcluded + promptPauseLine + "\n**PROMPT CONCLUDED**"
+        await prompt.clear_reaction("✅")
+        await prompt.clear_reaction("❌")   
+        await prompt.clear_reaction("⏯")
+        await prompt.clear_reaction("🔄")
+    elif getConfigInt(guildID, channelID, "promptcontributions") > 0:
+        content = promptPauseLine + promptHeaderActive + promptText + promptCodeLine + promptConLine + promptReminderActive + promptPauseLine
+        await prompt.add_reaction("📜")
+    else:
+        content = promptPauseLine + promptHeader + promptText + promptCodeLine + promptConLine + promptReminder + promptPauseLine
     await prompt.edit(content=content)
+
+async def promptConcluder(guildID, channelID, channel, promptCode):
+    conChannel = contributors[f"{guildID}"][f"{channelID}"]
+    contributions = getConfigInt(guildID, channelID, "promptcontributions")
+    try:
+        oldID = getConfigInt(guildID, channelID, "promptID")
+        oldPin = await channel.fetch_message(oldID)
+        await oldPin.unpin()
+        if not contributions:
+            oldMsg = await channel.fetch_message(oldID)
+            await oldMsg.delete()        
+    except:
+        pass
+    if contributions:
+        concluded = getConfig(guildID, channelID, "concluded")
+        concluded += f" {promptCode}"
+        addConfig(guildID, channelID, "concluded", concluded)
+        for post in conChannel["posts"]:
+            await post.delete()
+        for userID in conChannel["pool"]:
+            user = await bot.fetch_user(userID)
+            await user.send(f"Prompt {promptCode} has ended. Related posts have been deleted and archived; you can read the story by reacting to its prompt with :scroll:") 
+        await promptUpdater(guildID, channelID, promptCode)
+
+async def logDisplay(user, promptCode):
+    fpath = f"{promptLogs}\{promptCode}.txt"
+    file = discord.File(fpath, f"Story_Log_{promptCode}.txt")
+    await user.send(f"**Story Log for Prompt {promptCode}**", file=file)
 
 async def replyOrSend(user, iID, iToken, isInteraction, message):
     if isInteraction:
@@ -2129,40 +2240,46 @@ async def sendNext(guildID, channelID, promptCode, turnLength):
     nextUser = await bot.fetch_user(nextUID)
     msg = await nextUser.send(f"For the next {turnLength} minutes, it is your turn to /post ▶️ contributions to prompt {promptCode}. /pass ⏩ to end your turn early; 📝 to display the prompt; 📚 to display the prompt's three most recent posts; /drop ❌ to leave the prompt.")
     try:
-        reactables.remove(conChannel["postReactible"].id)
+        removeReactable(conChannel["postReactible"].id)
     except:
         pass
-    reactables.append(msg.id)
+    try:
+        await conChannel["postReactible"].unpin()
+    except:
+        pass
+    addReactable(msg.id)
     conChannel["postReactible"] = msg
     await msg.add_reaction("▶️")
     await msg.add_reaction("⏩")
     await msg.add_reaction("📝")
     await msg.add_reaction("📚")
     await msg.add_reaction("❌")
-    await msg.pin()
+    try:
+        await msg.pin()
+    except:
+        pass
 
 async def action_run(guildID, channelID, channel, iID, iToken, isInteraction):
     try:
-        promptID = getConfigInt(guildID, channelID, "promptID")
-        reactables.remove(promptID)
-        oldPin = await channel.fetch_message(promptID)
-        await oldPin.unpin()
-        if not contributors[f"{guildID}"][f"{channelID}"]["promptStarted"]:
-            oldMsg = await channel.fetch_message(promptID)
-            await oldMsg.delete()          
+        promptCode = getConfigInt(guildID, channelID, "promptcode")
+        await promptConcluder(guildID, channelID, channel, promptCode)
     except:
         pass
     if isInteraction:
         iHReply(iID, iToken, "Generating a prompt. Give me a moment.")
-    msgRaw = promptGenerator(guildID, channelID, None, addText=True)
-    msg = await channel.send(msgRaw)
-    reactables.append(msg.id)
+    generation = promptGenerator(guildID, channelID, None, addText=True)
+    text = generation[0]
+    msg = await channel.send(text)
+    addReactable(msg.id)
     addConfig(guildID, channelID, "promptID", msg.id)
-    if "New Round-Robbin" in msgRaw:
+    if generation[1]:
         await msg.add_reaction("✅")
         await msg.add_reaction("❌")   
         await msg.add_reaction("⏯")
-        await msg.pin()
+        try:
+            await msg.pin()
+        except:
+            pass
     await msg.add_reaction("🔄")
     await msg.add_reaction("❓")    
 
@@ -2170,23 +2287,23 @@ async def action_generate(guildID, channelID, userID, channel, iID, iToken, isIn
     if guildID:
         genID = getConfigInt(guildID, channelID, "genid")
         if genID:
-            reactables.remove(genID)
+            addReactable(genID)
     else:
         if f"{userID}" in DMConfig:
             if "genID" in DMConfig[f"{userID}"]:
                 genID = DMConfig[f"{userID}"]["genID"]
-                reactables.remove(genID)
+                removeReactable(genID)
         else:
             DMConfig[f"{userID}"] = {}   
     if isInteraction:
         iHReply(iID, iToken, "Generating a prompt using this channel's settings. This prompt will only be shown, not run. To create a story contributors can join, use /run.")
-    msg = promptGenerator(guildID, channelID, userID, addText=False)
+    msg = promptGenerator(guildID, channelID, userID, addText=False)[0]
     if guildID:
         message = await channel.send(msg)
     else:
         user = await bot.fetch_user(userID)
         message = await user.send(msg)
-    reactables.append(message.id)
+    addReactable(message.id)
     if guildID:
         addConfig(guildID, channelID, "genid", f"{message.id}")
     else:
@@ -2202,15 +2319,15 @@ async def action_join(userID, promptCode, iID, iToken, isInteraction):
     channelID = data[1]
     conChannel = contributors[f"{guildID}"][f"{channelID}"]
     if userID in contributors[f"{guildID}"]["banned"]:
-        bot.loop.create_task(replyOrSend(user, iID, iToken, isInteraction, "You have been banned, and can no longer join or contribute to prompts in this server."))
+        task(replyOrSend(user, iID, iToken, isInteraction, "You have been banned, and can no longer join or contribute to prompts in this server."))
         return
     if userID in conChannel["kicked"]:
-        bot.loop.create_task(replyOrSend(user, iID, iToken, isInteraction, f"You have been kicked from prompt {promptCode} and can no longer join or contribute to it. This is only temporary. You will be able to rejoin prompts in this server / channel when a new one is created."))
+        task(replyOrSend(user, iID, iToken, isInteraction, f"You have been kicked from prompt {promptCode} and can no longer join or contribute to it. This is only temporary. You will be able to rejoin prompts in this server / channel when a new one is created."))
         return
     pool = conChannel["pool"]
     turn = conChannel["turn"]
     turnLength = getConfigInt(guildID, channelID, "turn_length")
-    contributions = conChannel["contributions"]
+    contributions = getConfigInt(guildID, channelID, "promptcontributions")
     if len(pool) < getConfigInt(guildID, channelID, "contributor_maximum"):
         if userID in pool:
             if isInteraction:
@@ -2224,7 +2341,7 @@ async def action_join(userID, promptCode, iID, iToken, isInteraction):
             pool = conChannel["pool"]
             position = pool.index(userID)
             rPosition = position + 1
-            bot.loop.create_task(promptUpdater(guildID, channelID))
+            task(promptUpdater(guildID, channelID, promptCode))
             if position >= turn:
                 wait = position - turn
             else:
@@ -2232,33 +2349,34 @@ async def action_join(userID, promptCode, iID, iToken, isInteraction):
             waitTime = wait*turnLength
             conMin = getConfigInt(guildID, channelID, 'contributor_minimum')
             if conChannel["paused"]:
-                bot.loop.create_task(replyOrSend(user, iID, iToken, isInteraction, f"You have joined the pool of contributors for prompt {promptCode} under the alias {alias}. The prompt is currently paused. I will message you when it unpauses."))
+                task(replyOrSend(user, iID, iToken, isInteraction, f"You have joined the pool of contributors for prompt {promptCode} under the alias {alias}. The prompt is currently paused. I will message you when it unpauses."))
                 return
             if conChannel["promptStarted"]:
                 if len(pool) > conMin:
-                    bot.loop.create_task(replyOrSend(user, iID, iToken, isInteraction, f"You have joined the pool of contributors for prompt {promptCode} under the alias {alias}. You are contributor #{rPosition}. It will be your turn in {wait} turns. Your next turn will begin in at most {waitTime} minutes."))
+                    task(replyOrSend(user, iID, iToken, isInteraction, f"You have joined the pool of contributors for prompt {promptCode} under the alias {alias}. You are contributor #{rPosition}. It will be your turn in {wait} turns. Your next turn will begin in at most {waitTime} minutes."))
                     return
                 if(len(pool)) < conMin:
-                    bot.loop.create_task(replyOrSend(user, iID, iToken, isInteraction, f"You have joined the pool of contributors for prompt {promptCode} under the alias {alias}. I will message you when enough contributors have joined to begin the prompt."))
+                    task(replyOrSend(user, iID, iToken, isInteraction, f"You have joined the pool of contributors for prompt {promptCode} under the alias {alias}. I will message you when enough contributors have joined to begin the prompt."))
                     return
             if len(pool) == conMin:
                 conChannel["promptStarted"] = True  
-                bot.loop.create_task(replyOrSend(user, iID, iToken, isInteraction, f"You have joined the pool of contributors for prompt {promptCode} under the alias {alias}. The prompt now has the minimum required number of contributors and will begin. You are contributor #{rPosition}. Your next turn will start in at most {waitTime} minutes."))
-                bot.loop.create_task(sendNext(guildID, channelID, promptCode, turnLength))
+                task(replyOrSend(user, iID, iToken, isInteraction, f"You have joined the pool of contributors for prompt {promptCode} under the alias {alias}. The prompt now has the minimum required number of contributors and will begin. You are contributor #{rPosition}. Your next turn will start in at most {waitTime} minutes."))
+                await sendNext(guildID, channelID, promptCode, turnLength)
                 for con in range(0, len(pool)):
                     pUserID = pool[con]
                     pUser = await bot.fetch_user(pUserID)
                     if con == 0:
-                        nextTime = ns() + 60000000000*turnLength
+                        nextTime = ns() + nsMinute*turnLength
+                        contributors[f"{guildID}"][f"{channelID}"]["timer"] = nextTime
                         createTimer(nextTime, "autopass", guildID, channelID, promptCode, pUserID, contributions)
                     else:
                         await pUser.send(f"Prompt {promptCode} is starting. You are contributor #{rPosition}. Your next turn will start in at most {waitTime} minutes.")
             else:
-                bot.loop.create_task(replyOrSend(user, iID, iToken, isInteraction, f"You have joined the pool of contributors for prompt {promptCode} under the alias {alias}. I will message you when enough contributors have joined to begin the prompt."))
+                task(replyOrSend(user, iID, iToken, isInteraction, f"You have joined the pool of contributors for prompt {promptCode} under the alias {alias}. I will message you when enough contributors have joined to begin the prompt."))
     else:
-        bot.loop.create_task(replyOrSend(user, iID, iToken, isInteraction, f"Prompt {promptCode} has already reached its maximum contributors. You cannot join at the moment. Sorry :("))
+        task(replyOrSend(user, iID, iToken, isInteraction, f"Prompt {promptCode} has already reached its maximum contributors. You cannot join at the moment. Sorry :("))
 
-async def action_post(userID, promptCode, text, iID, iToken, isInteraction):
+async def action_post(userID, promptCode, text, iID, iToken, isInteraction, isPostMode):
     user = await bot.fetch_user(userID)
     data = codeChecker(promptCode)
     if not data:
@@ -2267,10 +2385,10 @@ async def action_post(userID, promptCode, text, iID, iToken, isInteraction):
     channelID = data[1]
     conChannel = contributors[f"{guildID}"][f"{channelID}"]
     if userID in contributors[f"{guildID}"]["banned"]:
-        bot.loop.create_task(replyOrSend(user, iID, iToken, isInteraction, "You have been banned, and can no longer join or contribute to prompts in this server."))
+        task(replyOrSend(user, iID, iToken, isInteraction, "You have been banned, and can no longer join or contribute to prompts in this server."))
         return
     if userID in conChannel["kicked"]:
-        bot.loop.create_task(replyOrSend(user, iID, iToken, isInteraction, f"You have been kicked from prompt {promptCode} and can no longer join or contribute to it. This is only temporary. You will be able to rejoin prompts in this server / channel when a new one is created."))
+        task(replyOrSend(user, iID, iToken, isInteraction, f"You have been kicked from prompt {promptCode} and can no longer join or contribute to it. This is only temporary. You will be able to rejoin prompts in this server / channel when a new one is created."))
         return
     pool = conChannel["pool"]
     turn = conChannel["turn"]
@@ -2280,19 +2398,27 @@ async def action_post(userID, promptCode, text, iID, iToken, isInteraction):
     if userID in pool:
         if turn == position:
             if conChannel["paused"]:
-                bot.loop.create_task(replyOrSend(user, iID, iToken, isInteraction, f"Prompt {promptCode} is currently paused and all actions except dropping and joining are disabled until it resumes. I will message you when it unpauses."))
+                task(replyOrSend(user, iID, iToken, isInteraction, f"Prompt {promptCode} is currently paused and all actions except dropping and joining are disabled until it resumes. I will message you when it unpauses."))
                 return
             alias = conChannel[f"{userID}"]["alias"]
-            if isInteraction:
-                conChannel["contributions"] += 1
+            if isInteraction or isPostMode:
+                contributions = getConfigInt(guildID, channelID, "promptcontributions")
+                contributions += 1
+                addConfig(guildID, channelID, "promptcontributions", contributions)
+                if contributions == 1:
+                    task(promptUpdater(guildID, channelID, promptCode))
                 conChannel["context"].pop(0)
                 conChannel["context"].append(f">>> *from {alias}:*\n{text}")
                 if multipost:
-                    await channel.send(f"{text}")
+                    msg = await channel.send(text)
                 else:
-                    await channel.send(f"*from {alias}:*\n{text}")
+                    text = f"*from {alias}:*\n{text}"
+                    msg = await channel.send(text)
                     conChannel["multipost"] = True
-                iHReply(iID, iToken, f"The text you submitted has been posted to prompt {promptCode} under the alias {alias}. You may continue to /post until your turn ends. /pass to end your turn early.")
+                if isInteraction:
+                    iHReply(iID, iToken, f"The text you submitted has been posted to prompt {promptCode} under the alias {alias}. You may continue to /post until your turn ends. /pass to end your turn early.")
+                conChannel["posts"].append(msg)
+                logUpdater(guildID, channelID, promptCode, text)
                 return
             else:
                 await user.send(f"You have entered Post Mode. Any messages you send me here will be posted to prompt {promptCode} under the alias {alias}. Your turn will still end at its normal time. /pass to end Post Mode (and your turn) early.")
@@ -2304,11 +2430,11 @@ async def action_post(userID, promptCode, text, iID, iToken, isInteraction):
             else:
                 wait = len(pool) - (turn - position) - 1
             waitTime = wait*turnLength 
-            bot.loop.create_task(replyOrSend(user, iID, iToken, isInteraction, f"It is not your turn to contribute to prompt {promptCode}. It will be your turn in {wait} turns. Your next turn will begin in at most {waitTime} minutes."))
+            task(replyOrSend(user, iID, iToken, isInteraction, f"It is not your turn to contribute to prompt {promptCode}. It will be your turn in {wait} turns. Your next turn will begin in at most {waitTime} minutes."))
     elif isInteraction:
         iHReply(iID, iToken, f"You are not part of the contributor pool for prompt {promptCode}. You need to /join it before you can take a turn.")
 
-async def action_pass(userID, promptCode, iID, iToken, isInteraction, isDrop):
+async def action_pass(userID, promptCode, iID, iToken, isInteraction, isDrop, isAutopass):
     user = await bot.fetch_user(userID)
     data = codeChecker(promptCode)
     if not data:
@@ -2317,13 +2443,13 @@ async def action_pass(userID, promptCode, iID, iToken, isInteraction, isDrop):
     channelID = data[1]
     conChannel = contributors[f"{guildID}"][f"{channelID}"]
     if userID in contributors[f"{guildID}"]["banned"]:
-        bot.loop.create_task(replyOrSend(user, iID, iToken, isInteraction, "You have been banned, and can no longer join or contribute to prompts in this server."))
+        task(replyOrSend(user, iID, iToken, isInteraction, "You have been banned, and can no longer join or contribute to prompts in this server."))
         return
     if userID in conChannel["kicked"]:
-        bot.loop.create_task(replyOrSend(user, iID, iToken, isInteraction, f"You have been kicked from prompt {promptCode} and can no longer join or contribute to it. This is only temporary. You will be able to rejoin prompts in this server / channel when a new one is created."))
+        task(replyOrSend(user, iID, iToken, isInteraction, f"You have been kicked from prompt {promptCode} and can no longer join or contribute to it. This is only temporary. You will be able to rejoin prompts in this server / channel when a new one is created."))
         return
     pool = conChannel["pool"]
-    contributions = conChannel["contributions"]
+    getConfigInt(guildID, channelID, "promptcontributions")
     turn = conChannel["turn"]
     turnLength = getConfigInt(guildID, channelID, "turn_length")  
     promptStarted = conChannel["promptStarted"]
@@ -2341,31 +2467,34 @@ async def action_pass(userID, promptCode, iID, iToken, isInteraction, isDrop):
             if isDrop:
                 nextTurn(guildID, channelID)
             else:
-                bot.loop.create_task(replyOrSend(user, iID, iToken, isInteraction, f"Prompt {promptCode} is currently paused and all actions except dropping and joining are disabled until it resumes. I will message you when it unpauses."))
+                task(replyOrSend(user, iID, iToken, isInteraction, f"Prompt {promptCode} is currently paused and all actions except dropping and joining are disabled until it resumes. I will message you when it unpauses."))
             return
         if promptStarted and len(pool) >= getConfigInt(guildID, channelID, "contributor_minimum"):
             if turn == position:
                 timers.pop(f'{conChannel["timer"]}', None)
                 nextTurn(guildID, channelID)
-                nextTime = ns() + 60000000000*turnLength
-                conChannel["timer"] = nextTime
+                nextTime = ns() + nsMinute*turnLength
                 nextUID = pool[conChannel["turn"]]
-                if not isDrop:
-                    bot.loop.create_task(replyOrSend(user, iID, iToken, isInteraction, f"You have ended your turn for prompt {promptCode}. It will be your turn in {wait} turns. Your next turn will begin in at most {waitTime} minutes."))               
+                if not isDrop and not isAutopass:
+                    task(replyOrSend(user, iID, iToken, isInteraction, f"You have ended your turn for prompt {promptCode}. It will be your turn in {wait} turns. Your next turn will begin in at most {waitTime} minutes."))               
+                if not isDrop and isAutopass:
+                    await user.send(f"Your turn for prompt {promptCode} has automatically ended. It will be your turn in {wait} turns. Your next turn will begin in at most {waitTime} minutes.")
+                contributions = getConfigInt(guildID, channelID, "promptcontributions")
+                contributors[f"{guildID}"][f"{channelID}"]["timer"] = nextTime
                 createTimer(nextTime, "autopass", guildID, channelID, promptCode, nextUID, contributions)
                 contributors["postMode"].pop(f"{userID}", None)
-                reactables.remove(conChannel["postReactible"].id)
+                removeReactable(conChannel["postReactible"].id)
                 await conChannel["postReactible"].unpin()
                 if len(pool) >= getConfigInt(guildID, channelID, 'contributor_minimum'):
-                    bot.loop.create_task(sendNext(guildID, channelID, promptCode, turnLength))
-            else:
-                bot.loop.create_task(replyOrSend(user, iID, iToken, isInteraction, f"It is not your turn to contribute to prompt {promptCode}. It will be your turn in {wait} turns. Your next turn will begin in at most {waitTime} minutes."))
+                    task(sendNext(guildID, channelID, promptCode, turnLength))
+            elif not isAutopass:
+                task(replyOrSend(user, iID, iToken, isInteraction, f"It is not your turn to contribute to prompt {promptCode}. It will be your turn in {wait} turns. Your next turn will begin in at most {waitTime} minutes."))
         elif isInteraction:
             iHReply(iID, iToken, f"Prompt {promptCode} does not have enough contributors to start. When it does, you will have turn #{position} and may have to wait up to {waitTime} minutes before it is your turn.")   
     elif isInteraction:
         iHReply(iID, iToken, f"You are not part of the contributor pool for prompt {promptCode}. You need to /join it before you can take a turn.")        
 
-async def action_drop(userID, promptCode, iID, iToken, alias, isInteraction, isKick, isBan):
+async def action_drop(userID, promptCode, iID, iToken, alias, isInteraction, isKick, isBan, isAutopass):
     user = await bot.fetch_user(userID)
     data = codeChecker(promptCode)
     if not data:
@@ -2379,7 +2508,7 @@ async def action_drop(userID, promptCode, iID, iToken, alias, isInteraction, isK
         pos = pool.index(userID)
         conChannel["pool"].remove(userID)
         if turn == pos:
-            await action_pass(userID, promptCode, None, None, isInteraction=False, isDrop=True)
+            await action_pass(userID, promptCode, None, None, isInteraction=False, isDrop=True, isAutopass=isAutopass)
             turn = conChannel["turn"]
         if turn > pos:
             conChannel["turn"] -= 1
@@ -2387,7 +2516,7 @@ async def action_drop(userID, promptCode, iID, iToken, alias, isInteraction, isK
             for id in pool:
                 u = await bot.fetch_user(id)
                 await u.send(f"Prompt {promptCode} has dropped below the minimum required contributors and has paused. It will resume when sufficient contributors have joined.")
-        bot.loop.create_task(promptUpdater(guildID, channelID))
+        task(promptUpdater(guildID, channelID, promptCode))
         if isKick:
             iHReply(iID, iToken, f'Contributor "{alias}" has been kicked from prompt {promptCode}.')
             await user.send(f"You have been kicked from prompt {promptCode}. You cannot rejoin that prompt, but can join other prompts and new ones as they are generated.")
@@ -2395,8 +2524,10 @@ async def action_drop(userID, promptCode, iID, iToken, alias, isInteraction, isK
             iHReply(iID, iToken, f'Contributor "{alias}" has been banned from all current and future prompts on this server.')
             guild = await bot.fetch_guild(guildID)
             await user.send(f"You have been permanently banned from contributing to all prompts in {guild.name}")
+        elif isAutopass:
+            await user.send(f"You have been dropped from the contributor pool of prompt {promptCode} for inactivity.")
         else:
-            bot.loop.create_task(replyOrSend(user, iID, iToken, isInteraction, f"You have dropped out of the contributor pool for prompt {promptCode}. You may /join it again at any time."))
+            task(replyOrSend(user, iID, iToken, isInteraction, f"You have dropped out of the contributor pool for prompt {promptCode}. You may /join it again at any time."))
     except:
         if isInteraction:
             if not isKick and not isBan:
@@ -2413,14 +2544,16 @@ async def action_pause(guildID, channelID, iID, iToken, isInteraction):
     if promptCode:
         if paused:
             conChannel["paused"] = False
-            bot.loop.create_task(promptUpdater(guildID, channelID))
+            task(promptUpdater(guildID, channelID, promptCode))
             if len(pool) >= getConfigInt(guildID, channelID, "contributor_minimum"):
                 turnLength = getConfigInt(guildID, channelID, "turn_length")
-                bot.loop.create_task(sendNext(guildID, channelID, promptCode, turnLength))
+                task(sendNext(guildID, channelID, promptCode, turnLength))
                 for pos in range(0, len(pool)):
                     if pos == turn and turn == 0 and not conChannel["promptStarted"]:
-                        nextTime = ns() + 60000000000*turnLength
-                        createTimer(nextTime, "autopass", guildID, channelID, promptCode, pool[pos], conChannel["contributions"])
+                        nextTime = ns() + nsMinute*turnLength
+                        contributions = getConfigInt(guildID, channelID, "promptcontributions")
+                        contributors[f"{guildID}"][f"{channelID}"]["timer"] = nextTime
+                        createTimer(nextTime, "autopass", guildID, channelID, promptCode, pool[pos], contributions)
                     elif pos != turn:
                         u = await bot.fetch_user(pool[pos])
                         rPosition = pos + 1
@@ -2435,7 +2568,7 @@ async def action_pause(guildID, channelID, iID, iToken, isInteraction):
                 iHReply(iID, iToken, f"Prompt {promptCode} has resumed. Use this command again to pause it.")
         else:
             conChannel["paused"] = True
-            bot.loop.create_task(promptUpdater(guildID, channelID))
+            task(promptUpdater(guildID, channelID, promptCode))
             postMode = contributors["postMode"]
             try:
                 timers.pop(f'{conChannel["timer"]}', None)
@@ -2459,7 +2592,7 @@ async def action_pause(guildID, channelID, iID, iToken, isInteraction):
 async def action_help(userID):
     user = await bot.fetch_user(userID)
     msg = await user.send("**Help Menu** (React to Select)\n  🪶 – About & User Guide\n  🎊 – Admin Startup\n  📊 – Prompt Configuration\n  🤖 – Automation\n  💸 – Github & Tip the Author")
-    reactables.append(msg.id)
+    addReactable(msg.id)
     await msg.add_reaction("🪶")
     await msg.add_reaction("🎊")
     await msg.add_reaction("📊")
@@ -2549,18 +2682,37 @@ async def on_interaction(data):
         return
     elif iName == "run":
         if moderator:
-            bot.loop.create_task(action_run(guildID, channelID, iChannel, iID, iToken, isInteraction = True))
+            task(action_run(guildID, channelID, iChannel, iID, iToken, isInteraction = True))
+        else:
+            iHReply(iID, iToken, f"You need the {moderatorName} role to use this command.")
+        return
+    elif iName == "autorun":
+        if moderator:
+            period = iOpt[0]["value"]
+            delay = iOpt[1]["value"]
+            addConfig(guildID, channelID, "autoperiod", period)
+            firstTime = ns() + nsMinute*delay
+            contributors[f"{guildID}"][f"{channelID}"]["autoTime"] = firstTime
+            createTimer(firstTime, "autorun", guildID, channelID, None, None, None)
+            iHReply(iID, iToken, f"Prompts will run automatically in this channel every {period} minutes, starting after a {delay}-minute delay.")
+        else:
+            iHReply(iID, iToken, f"You need the {moderatorName} role to use this command.")
+        return
+    elif iName == "autorun_stop":
+        if moderator:
+            timers.pop(f'{contributors[f"{guildID}"][f"{channelID}"]["autoTime"]}', None)
+            iHReply(iID, iToken, f"Prompts will no longer autorun in this channel.")
         else:
             iHReply(iID, iToken, f"You need the {moderatorName} role to use this command.")
         return
     elif iName == "generate":
         if guildID:
             if moderator:
-                bot.loop.create_task(action_generate(guildID, channelID, userID, iChannel, iID, iToken, isInteraction=True))
+                task(action_generate(guildID, channelID, userID, iChannel, iID, iToken, isInteraction=True))
             else:
                 iHReply(iID, iToken, f"You need the {moderatorName} role to use this command.")                
         else:
-            bot.loop.create_task(action_generate(guildID, channelID, userID, iChannel, iID, iToken, isInteraction=True))            
+            task(action_generate(guildID, channelID, userID, iChannel, iID, iToken, isInteraction=True))            
         return
     elif iName in ["time", "categories", "character_types", "contributors", "environments", "play_bdsm", "play_surreal", "play_vanilla", "species_anthros", "species_fantasy", "species_futuristic", "species_monster"]:
         if guildID:
@@ -2578,10 +2730,10 @@ async def on_interaction(data):
             if admin:
                 if iOpt[0]["value"] == "reset":
                     config = configparser.ConfigParser()
-                    configPath = ap(f'{guildID}.ini')
+                    configPath = ap(f'{serverConfigs}\{guildID}.ini')
                     config.read(configPath)
                     config[f'{channelID}'] = {}
-                    with open(f'{guildID}.ini', 'w') as configfile:
+                    with open(configPath, 'w') as configfile:
                         config.write(configfile)
                     iHReply(iID, iToken, f"Channel specific settings for{iChannel.name} have been reset. Using server defaults instead.")
                 else:
@@ -2606,14 +2758,14 @@ async def on_interaction(data):
             iHReply(iID, iToken, f"Something went wrong with your command. Make sure your prompt code is correct.")
         else:
             if iName == "join":
-                bot.loop.create_task(action_join(userID, promptCode, iID, iToken, isInteraction=True))
+                task(action_join(userID, promptCode, iID, iToken, isInteraction=True))
             elif iName == "post":
                 text = iOpt[1]["value"]
-                bot.loop.create_task(action_post(userID, promptCode, text, iID, iToken, isInteraction=True))
+                task(action_post(userID, promptCode, text, iID, iToken, isInteraction=True, isPostMode=False))
             elif iName == "pass":
-                bot.loop.create_task(action_pass(userID, promptCode, iID, iToken, isInteraction=True, isDrop=False))
+                task(action_pass(userID, promptCode, iID, iToken, isInteraction=True, isDrop=False, isAutopass=False))
             elif iName == "drop":
-                bot.loop.create_task(action_drop(userID, promptCode, iID, iToken, None, isInteraction=True, isKick=False, isBan=False))
+                task(action_drop(userID, promptCode, iID, iToken, None, isInteraction=True, isKick=False, isBan=False, isAutopass=False))
         return
     elif iName == "kick":
         if moderator:
@@ -2632,7 +2784,7 @@ async def on_interaction(data):
                 if kickID:
                     conChannel["kicked"].append(kickID)
                     promptCode = getConfig(guildID, channelID, "promptcode")
-                    bot.loop.create_task(action_drop(kickID, promptCode, iID, iToken, alias, isInteraction=True, isKick=True, isBan=False))
+                    task(action_drop(kickID, promptCode, iID, iToken, alias, isInteraction=True, isKick=True, isBan=False, isAutopass=False))
                 else:
                     iHReply(iID, iToken, f'Could not find a contributor to kick with alias "{alias}". Make sure to use this command in the channel this alias was used in.')
             except:
@@ -2657,7 +2809,7 @@ async def on_interaction(data):
                 if banID:
                     contributors[f"{guildID}"]["banned"].append(banID)
                     promptCode = getConfig(guildID, channelID, "promptcode")
-                    bot.loop.create_task(action_drop(banID, promptCode, iID, iToken, alias, isInteraction=True, isKick=False, isBan=True))
+                    task(action_drop(banID, promptCode, iID, iToken, alias, isInteraction=True, isKick=False, isBan=True, isAutopass=False))
                 else:
                     iHReply(iID, iToken, f'Could not find a contributor to ban with alias "{alias}". Make sure to use this command in the channel this alias was used in.')
             except:
@@ -2680,7 +2832,7 @@ async def on_interaction(data):
         return
     elif iName == "pause":
         if moderator:
-            bot.loop.create_task(action_pause(guildID, channelID, iID, iToken, isInteraction=True))
+            task(action_pause(guildID, channelID, iID, iToken, isInteraction=True))
         else:
             iHReply(iID, iToken, "You do not have permission to pause/unpause prompts on this server")
         return
@@ -2690,7 +2842,7 @@ async def on_interaction(data):
             iHReply(iID, iToken, "To view LewdRobin's help menu, you need to enable direct messages from server members (User Settings -> Privacy & Safety)")
             return
         iHReply(iID, iToken, "Check your DMs for the help menu.")
-        bot.loop.create_task(action_help(userID))
+        task(action_help(userID))
         return
     elif iName == "unban_all":
         if admin:
@@ -2702,6 +2854,27 @@ async def on_interaction(data):
         else:
             iHReply(iID, iToken, f"You need the {adminName} role to use this command.")
         return
+    elif iName == "conclude":
+        if moderator:
+            try:
+                promptCode = getConfig(guildID, channelID, "promptcode")
+                if int(promptCode):
+                    channel = await bot.fetch_channel(channelID)
+                    await promptConcluder(guildID, channelID, channel, promptCode)
+                    contributorsConfig(guildID, channelID)
+                    addConfig(guildID, channelID, "promptCode", 0)
+                    addConfig(guildID, channelID, "promptID", 0)
+                    addConfig(guildID, channelID, "promptContributions", 0)
+                    addConfig(guildID, channelID, "promptText", "")
+                    contributorsConfig(guildID, channelID)
+                    iHReply(iID, iToken, f"Prompt {promptCode} has been concluded.")
+                else:
+                    iHReply(iID, iToken, f"No active prompt found in this channel.")
+            except:
+                iHReply(iID, iToken, f"No active prompt found in this channel.")
+        else:
+            iHReply(iID, iToken, f"You need the {moderatorName} role to use this command.")
+        return      
 
 @bot.event
 async def on_message(message):
@@ -2709,34 +2882,22 @@ async def on_message(message):
     if userID == bot.user.id:
         if message.is_system():
             await message.delete()
-    if isinstance(message.channel, discord.channel.DMChannel):
+    elif isinstance(message.channel, discord.channel.DMChannel):
         postMode = contributors["postMode"]
         if f"{userID}" in postMode.keys():
             data = codeChecker(postMode[f'{userID}'])
-            try:
-                guildID = data[0]
-                channelID = data[1]
-                channel = await bot.fetch_channel(channelID)
-                conChannel = contributors[f"{guildID}"][f"{channelID}"]
-                alias = conChannel[f"{userID}"]["alias"]
-                text = message.content
-                conChannel["contributions"] += 1
-                conChannel["context"].pop(0)
-                conChannel["context"].append(f">>> *from {alias}:*\n{text}")
-                if not conChannel["multipost"]:
-                    await channel.send(f"*From {alias}:*\n{text}")
-                    conChannel["multipost"] = True
-                else:
-                    await channel.send(text)
-            except:
-                pass
+            guildID = data[0]
+            channelID = data[1]
+            text = message.content
+            promptCode = getConfig(guildID, channelID, "promptcode")
+            task(action_post(userID, promptCode, text, None, None, isInteraction=False, isPostMode=True))
 
 @bot.event
 async def on_raw_reaction_add(payload):
     botID = bot.user.id  
     messageID = payload.message_id
     userID = payload.user_id
-    if messageID in reactables and userID != botID:
+    if messageID in getReactables() and userID != botID:
         emoji = payload.emoji.name
         user = await bot.fetch_user(userID)
         channelID = payload.channel_id
@@ -2771,10 +2932,10 @@ async def on_raw_reaction_add(payload):
             pass
         if not guildID:
             if emoji == "▶️":
-                bot.loop.create_task(action_post(userID, promptCode, None, None, None, isInteraction=False))
+                task(action_post(userID, promptCode, None, None, None, isInteraction=False, isPostMode=False))
                 return
             if emoji == "⏩":
-                bot.loop.create_task(action_pass(userID, promptCode, None, None, isInteraction=False, isDrop=False))
+                task(action_pass(userID, promptCode, None, None, isInteraction=False, isDrop=False, isAutopass=False))
                 return
             if emoji == "📝":
                 data = codeChecker(promptCode)
@@ -2788,7 +2949,7 @@ async def on_raw_reaction_add(payload):
                 return
             if emoji == "🪶":
                 await user.send("**About**\nI am a bot that facilitates anonymous collaborative erotic writing.\nI generate writing prompts from a configurable pool of environments, characters, scenes, and play types. Contributors then join my prompts anonymously and are assigned temporary aliases which their writing will be posted under.\nWith my prompt as a starting point, contributors take turns adding to the story. Each contributor gets a configurable amount of time to write before the turn passes to the next person in line.")
-                await user.send("**User Guide**\nAll of my user-facing features can be accessed either through slash commands or reactions. I'll list both ways in this guide.\n*Contributing to a prompt, step-by-step*\n**1.**  Make sure your server admins have invited me to their server, configured a channel for my prompts to play out in, and generated a prompt.\n**2.**  You can join my prompt by reacting to it with ✅ or by using the /join command along with the prompt's 4-digit code either in the server or in my DMs. Once you've joined, I'll DM you with the alias your contributions will be made under. However, the prompt may not immediately begin if it has fewer than the minimum required contributors (this count updates on the prompt message).\n**3.**  Contributing is turn-based, and each player gets 30 minutes (default) to contribute. I'll DM you when it's your turn. That DM will get pinned, and has a set of reacitons you can use to control your turn. If you need a refresher on the prompt, react with 📝 and I'll DM it to you. If you'd like some context, react with 📚 and I'll DM you the three most recent contributions to the prompt.\n**4.**  Now it's your turn to start contributing. You can do this in two ways. You can use the /post slash command with the prompt number and the text you'd like to post, either in the relevant server or my DMs. The easier way, however, is to react with ▶️ to enter Play Mode. Play Mode lasts the rest of your turn, and while you're in it, anything you DM me (except slash commands) will get posted as a contribution to the prompt.\n**5.**  Your turn will end automatically after its designated duration is over. You can end it early with ⏩ or /pass. You can also drop from the prompt at any time with ❌ (on the DM I sent you when your turn started or the prompt itself) or /drop. If you don't post a contribution or pass your turn within the time limit, you will be dropped from the prompt for inactivity.")
+                await user.send("**User Guide**\nAll of my user-facing features can be accessed either through slash commands or reactions. I'll list both ways in this guide.\n*Contributing to a prompt, step-by-step*\n**1.**  Make sure your server admins have invited me to their server, configured a channel for my prompts to play out in, and generated a prompt.\n**2.**  You can join my prompt by reacting to it with ✅ or by using the /join command along with the prompt's 4-digit code either in the server or in my DMs. Once you've joined, I'll DM you with the alias your contributions will be made under. However, the prompt may not immediately begin if it has fewer than the minimum required contributors (this count updates on the prompt message).\n**3.**  Contributing is turn-based, and each player gets 30 minutes (default) to contribute. I'll DM you when it's your turn. That DM will get pinned, and has a set of reacitons you can use to control your turn. If you need a refresher on the prompt, react with 📝 and I'll DM it to you. If you'd like some context, react with 📚 and I'll DM you the three most recent contributions to the prompt.\n**4.**  Now it's your turn to start contributing. You can do this in two ways. You can use the /post slash command with the prompt number and the text you'd like to post, either in the relevant server or my DMs. The easier way, however, is to react with ▶️ to enter Play Mode. Play Mode lasts the rest of your turn, and while you're in it, anything you DM me (except slash commands) will get posted as a contribution to the prompt.\n**5.**  Your turn will end automatically after its designated duration is over. You can end it early with ⏩ or /pass. You can also drop from the prompt at any time with ❌ (on the DM I sent you when your turn started or the prompt itself) or /drop. If you don't post a contribution or pass your turn within the time limit, you will be dropped from the prompt for inactivity.\n If you'd like to toy with prompt generation, you can use /generate in my DMs and set up generation settings in our private channel.")
                 return
             if emoji == "🎊":
                 await user.send("**Admin Startup**\n*step-by-step guide to get me set up on your server*\n**1.**  Use this link to add me to your server:\n[temporarily disabled until Lewd Robin has a stable host server]\nOnce you've added me to your server, I'll need a minute or two to set up slash commands.\n**2.**  Make a channel for my prompts to run in. I will need the `View Channel, Send Message, Add Reactions, Manage Messages, and Read Message History` permissions here. Potential contributors to the prompts I generate here should have the `View Channel, Add Reactions, Read Message History, and Use Slash Commands` permissions here. They should *not* have the `Send Messages` persmission in this channel.\n**3.**  Create LewdRobin Admin and Moderator roles. By default, only server admins can configure my settings or run prompts. If you want other members of your server to be able to do so, you will have to create roles for them. These will control who can use which slash and reaction commands in this server. These roles can be called anything, and don't need to grant any actual Discord permissions. Once you've created these roles, you will need to copy their IDs. To do this enable developer mode (User Settings -> Advanced -> Developer Mode) and right click on the roles in the role interface. Use the /roles command and paste in the role IDs for the IDs you want to be LewdRobin Admins and Moderators.\n*Admins* can configure, /display and /reset settings, /ban and /unban_all contributors.\n*Moderators* can /run prompts, /pause and resume prompts, and /kick contributors.\n**4.**  Configure settings. I use default settings to start with, but they can be fine-tuned for each channel I run prompts in. See 📊 Prompt Configuration for more info.")
@@ -2797,7 +2958,7 @@ async def on_raw_reaction_add(payload):
                 await user.send("**Prompt Configuration**\nThis will cover prompt settings configurable by people with the LewdRobin Admin role for your server. All settings have a server-wide default which is not (currently) modifiable. Any adjustments to settings are made on a channel-by-channel basis. Use /display_settings in a channel to create a message displaying its current settings. Modify settings with the commands listed below.\n**/Contributors**\n  turn_length – length in minutes of each contributor's turn\n  contributor_minimum – the minimum number of contributors a prompt needs before it can start\n  contributor_maximum – the most contributors a prompt can have at once\n**/categories**\n  [category]_on – whether prompts will generate this type of thing. At least one category must be turned on.\n  character_number – how many randomly generated characters will be created per prompt\n  play_number – how many play types will be generated per prompt\n**/environments**\nEnvironments and scenes both use these tags to determine the pool for generation. If any of an environment's tags are excluded here, it will be excluded; scenes are then drawn from a pool that matches the environment's tags.\n  [america/europe/japan] - environments set in this specific region\n  historical – environments set before 1980\n  modern – environments set between 1980 and 2030\n  futuristic – environments set after 2030\n  fantasy – environments with magical or fantasy-related elements\n**/character_types**\n  [type] – toggles whether this type of character is generated. If at least one of cis_men or cis_women are enabled, they will be given a weighted bias in the generation pool.\n**/species**\nIf humans are enabled, they will be given a weighted bias.\n  [species] – whether characters from this species group will be generated. May include multiple similar species.\n**/play**\n  [play type] – whether play recommendations from this activity group will be included. May include multiple similar activities.")
                 return
             if emoji == "🤖":
-                await user.send("**Automation**\nThis feature is still under development, and the related /time command doesn't do anything (yet). Check back later. :)")
+                await user.send("**Automation**\nThe full automation feature is still under development, and the related /time command doesn't do anything (yet). However, basic automation can be started with /autorun and stopped with /autorun_stop. It will let you generate new prompts in a channel at a regular period.")
                 return
             if emoji == "💸":
                 await user.send(f"**Github**\nMy code is open source and free for anyone to use or modify. Find it at:\n<https://github.com/FaraCreations/LewdRobin>\n\n**Tip the Author**\nFara spent a lot of time lovingly coding to make me work. If you'd like to send her a tip, you can do so via:\n<https://paypal.me/FaraCreations>")
@@ -2805,7 +2966,7 @@ async def on_raw_reaction_add(payload):
         if emoji == "🔄":
             if moderator:
                 user = await bot.fetch_user(userID)
-                bot.loop.create_task(action_run(guildID, channelID, channel, None, None, isInteraction = False))
+                task(action_run(guildID, channelID, channel, None, None, isInteraction = False))
             else:
                 msg = await channel.send(f"To run prompts in this channel, you need the {moderatorName} role.")
                 await msg.delete(delay = 15)
@@ -2824,7 +2985,7 @@ async def on_raw_reaction_add(payload):
                         if reaction.emoji == "❓":
                             await reaction.remove(user)
                 return
-            bot.loop.create_task(action_help(userID))
+            task(action_help(userID))
             if guildID:
                 for reaction in message.reactions:
                     if reaction.emoji == "❓":
@@ -2839,7 +3000,7 @@ async def on_raw_reaction_add(payload):
                         if reaction.emoji == "✅":
                             await reaction.remove(user)
                 return
-            bot.loop.create_task(action_join(userID, promptCode, None, None, isInteraction=False))
+            task(action_join(userID, promptCode, None, None, isInteraction=False))
             if guildID:
                 for reaction in message.reactions:
                     if reaction.emoji == "✅":
@@ -2854,15 +3015,31 @@ async def on_raw_reaction_add(payload):
                         if reaction.emoji == "❌":
                             await reaction.remove(user)
                 return
-            bot.loop.create_task(action_drop(userID, promptCode, None, None, None, isInteraction=False, isKick=False, isBan=False))
+            task(action_drop(userID, promptCode, None, None, None, isInteraction=False, isKick=False, isBan=False, isAutopass=False))
             if guildID:
                 for reaction in message.reactions:
                     if reaction.emoji == "❌":
                         await reaction.remove(user)
+            return
+        if emoji == "📜":
+            if not await can_message(user):
+                msg = await channel.send("To recieve LewdRobin story logs, you need to enable direct messages from server members (User Settings -> Privacy & Safety)")
+                await msg.delete(delay = 15)
+                if guildID:
+                    for reaction in message.reactions:
+                        if reaction.emoji == "📜":
+                            await reaction.remove(user)
+                return
+            promptCode = re.findall("(?<=\*\*Prompt\sCode:\*\*\s)(\d\d\d\d)", message.content)[0]
+            task(logDisplay(user, promptCode))
+            if guildID:
+                for reaction in message.reactions:
+                    if reaction.emoji == "📜":
+                        await reaction.remove(user)
             return   
         if emoji == "⏯":
             if moderator:
-                bot.loop.create_task(action_pause(guildID, channelID, None, None, isInteraction=False))
+                task(action_pause(guildID, channelID, None, None, isInteraction=False))
             else:
                 msg = await channel.send(f"To pause/resume prompts in this channel, you need a {moderatorName} role.")
                 await msg.delete(delay = 15)
@@ -2874,7 +3051,7 @@ async def on_raw_reaction_add(payload):
         if emoji == "🔃":
             if guildID:
                 if moderator:
-                    bot.loop.create_task(action_generate(guildID, channelID, userID, channel, None, None, isInteraction=False))
+                    task(action_generate(guildID, channelID, userID, channel, None, None, isInteraction=False))
                 else:
                     msg = await channel.send(f"To generate prompts here, you need the {moderatorName} role. You can generate prompts privately by DMing me /generate, though!")
                     await msg.delete(delay = 15)
@@ -2882,7 +3059,7 @@ async def on_raw_reaction_add(payload):
                         if reaction.emoji == "🔃":
                             await reaction.remove(user)
             else:
-                bot.loop.create_task(action_generate(guildID, channelID, userID, channel, None, None, isInteraction=False))
+                task(action_generate(guildID, channelID, userID, channel, None, None, isInteraction=False))
             return
         if guildID:
             for reaction in message.reactions:
@@ -2900,47 +3077,29 @@ async def timer_loop():
                 channelID = timers[timer]["channelID"]
                 promptCode = timers[timer]["promptCode"]
                 userID = timers[timer]["userID"]
-                contributions = timers[timer]["contributions"]
-                conChannel = contributors[f"{guildID}"][f"{channelID}"]
-                pool = conChannel["pool"]
-                turn = conChannel["turn"]
+                contributions = getConfigInt(guildID, channelID, "promptcontributions")
+                contributionsTimer = timers[timer]["contributions"]
                 if now > time:
-                    turnLength = getConfigInt(guildID, channelID, "turn_length")
-                    if action == "autopassDISABLED":
-                        if contributions == conChannel["contributions"]:
-                            if dropUser(guildID, channelID, userID):
-                                user = await bot.fetch_user(userID)
-                                await user.send(f"You have been dropped from the contributor pool of prompt {promptCode} for inactivity.")
-                                if len(pool) < getConfigInt(guildID, channelID, "contributor_minimum"):
-                                    for id in pool:
-                                        u = await bot.fetch_user(id)
-                                        await u.send(f"Prompt {promptCode} has dropped below the minimum required contributors and has paused. It will resume when sufficient contributors have joined.")
-                        nextTurn(guildID, channelID)
-                        if contributions != conChannel["contributions"]:
-                            position = pool.index(userID)
-                            if position >= turn:
-                                wait = position - turn + 1
-                            else:
-                                wait = len(pool) - (turn - position) - 1 
-                            waitTime = wait*turnLength
-                            user = await bot.fetch_user(userID)
-                            await user.send(f"Your turn for prompt {promptCode} has automatically ended. It will be your turn in {wait} turns. Your next turn will begin in at most {waitTime} minutes.")
-                        if len(pool) >= getConfigInt(guildID, channelID, 'contributor_minimum'):
-                            nextTime = ns() + 60000000000*turnLength
-                            conChannel["timer"] = nextTime
-                            nextUID = pool[conChannel["turn"]]
-                            createTimerTemp(nextTime, "autopass", guildID, channelID, promptCode, nextUID, conChannel["contributions"])
-                            contributors["postMode"].pop(f"{userID}", None)
-                            bot.loop.create_task(sendNext(guildID, channelID, promptCode, turnLength))
-                        bot.loop.create_task(promptUpdater(guildID, channelID))
+                    if action == "autopass":
+                        if contributionsTimer == contributions:
+                            task(action_drop(userID, promptCode, None, None, None, isInteraction=False, isKick=False, isBan=False, isAutopass=True))
+                        if contributionsTimer != contributions:
+                            task(action_pass(userID, promptCode, None, None, isInteraction=False, isDrop=False, isAutopass=True))
+                    if action == "autorun":
+                        period = getConfigInt(guildID, channelID, "autoperiod")                         
+                        nextTime = ns() + nsMinute*period
+                        createTempTimer(nextTime, "autorun", guildID, channelID, None, None, None)
+                        channel = await bot.fetch_channel(channelID)
+                        await action_run(guildID, channelID, channel, None, None, isInteraction=False)
+                        contributors[f"{guildID}"][f"{channelID}"]["autoTime"] = nextTime
                     timers[timer] = None
             forDeletion = [timer for timer in timers if timers[timer] == None]
             for timer in forDeletion:
                 del timers[timer]
-            global timersTemp
-            if timersTemp:
-                timers.update(timersTemp)
-                timersTemp = {}
+            global tempTimers
+            timers.update(tempTimers)
+            tempTimers = {}
+
          
-bot.loop.create_task(timer_loop())
+task(timer_loop())
 bot.run(botToken)
