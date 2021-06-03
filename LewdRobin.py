@@ -43,8 +43,8 @@ initialize = {}
 initialize["on_ready"] = False
 initialize["guildCommands"] = True
 initialize["globalCommands"] = True
-initialize["deleteGlobalCommands"] = True
-initialize["deleteGuildCommands"] = True
+initialize["deleteGlobalCommands"] = False
+initialize["deleteGuildCommands"] = False
 headers = {"Authorization": f"Bot {botToken}"}
 promptHeader = ">>> **New LewdRobin Writing Prompt**"
 promptHeaderActive = ">>> **Active LewdRobin Writing Prompt**"
@@ -322,7 +322,7 @@ def listPopulator():
 
 def getConfig(guildID, channelID, configName):
     config = configparser.ConfigParser()
-    configPath = ap(f'{serverConfigs}\{guildID}.ini')
+    configPath = os.path.join(serverConfigs,f"{guildID}.ini")
     config.read(configPath)
     try:
         if f'{channelID}' in config.sections():
@@ -337,7 +337,7 @@ def getConfig(guildID, channelID, configName):
 
 def getConfigInt(guildID, channelID, configName):
     config = configparser.ConfigParser()
-    configPath = ap(f'{serverConfigs}\{guildID}.ini')
+    configPath = os.path.join(serverConfigs,f"{guildID}.ini")
     config.read(configPath)
     if f'{channelID}' in config.sections():
         if configName in config[f'{channelID}']:
@@ -349,7 +349,7 @@ def getConfigInt(guildID, channelID, configName):
 
 def getConfigBool(guildID, channelID, configName):
     config = configparser.ConfigParser()
-    configPath = ap(f'{serverConfigs}\{guildID}.ini')
+    configPath = os.path.join(serverConfigs,f"{guildID}.ini")
     config.read(configPath)
     if f'{channelID}' in config.sections():
         if configName in config[f'{channelID}']:
@@ -370,7 +370,7 @@ def getConfigDM(userID, configName):
 
 def getConfigDisplay(guildID, channelID, configName):
     config = configparser.ConfigParser()
-    configPath = ap(f'{serverConfigs}\{guildID}.ini')
+    configPath = os.path.join(serverConfigs,f"{guildID}.ini")
     config.read(configPath)
     try:
         if f'{channelID}' in config.sections():
@@ -394,7 +394,7 @@ def getConfigDMDisplay(userID, configName):
 
 def addConfig(guildID, channelID, configName, configValue):
     config = configparser.ConfigParser()
-    configPath = ap(f'{serverConfigs}\{guildID}.ini')
+    configPath = os.path.join(serverConfigs,f"{guildID}.ini")
     config.read(configPath)
     if f'{channelID}' not in config.sections():
         config.add_section(f'{channelID}')
@@ -469,7 +469,7 @@ def promptGenerator(guildID, channelID, userID, addText):
     poolPlay = []
     def exceptionTrimmer(listName):
         config = configparser.ConfigParser()
-        configPath = ap(f'{serverConfigs}\{guildID}.ini')
+        configPath = os.path.join(serverConfigs,f"{guildID}.ini")
         config.read(configPath)
         if f'{channelID}' in config.sections():
             def getLISection(li):
@@ -661,7 +661,7 @@ def promptGenerator(guildID, channelID, userID, addText):
 
 def createGuildConfig(guildID):
     config = configparser.ConfigParser()
-    configPath = ap(f'{serverConfigs}\{guildID}.ini')
+    configPath = os.path.join(serverConfigs,f"{guildID}.ini")
     config.read(configPath)
     config.add_section('default')
     config.set('default', 'admin', 'none')
@@ -1874,7 +1874,7 @@ def createGlobalCommands():
 
 def addChannel(guildID, channelID):
     config = configparser.ConfigParser()
-    configPath = ap(f'{serverConfigs}\{guildID}.ini')
+    configPath = os.path.join(serverConfigs,f"{guildID}.ini")
     config.read(configPath)
     if f'{channelID}' not in config.sections():
             config.add_section(f'{channelID}')  
@@ -2006,7 +2006,7 @@ def codeChecker(promptCode):
     for guildID in guildIDList:
         try:
             config = configparser.ConfigParser()
-            configPath = ap(f'{serverConfigs}\{guildID}.ini')
+            configPath = os.path.join(serverConfigs,f"{guildID}.ini")
             config.read(configPath)
             sections = config.sections()
             for section in sections:
@@ -2096,7 +2096,7 @@ def is_connected():
     return False
 
 def logUpdater(guildID, channelID, promptCode, text):
-    fpath = f"{promptLogs}\{promptCode}.txt"
+    fpath = os.path.join(promptLogs,f"{promptCode}.txt")
     try:
         with open(f"{fpath}", "x") as f:
             promptText = getConfig(guildID, channelID, "prompttext")
@@ -2118,12 +2118,12 @@ async def on_ready():
         except:
             pass
         async for guild in bot.fetch_guilds():
-            if not os.path.isfile(f'{serverConfigs}\{guild.id}.ini'):               
+            configPath = os.path.join(serverConfigs,f"{guild.id}.ini")
+            if not os.path.isfile(configPath):               
                 createGuildConfig(guild.id)
             contributors[f"{guild.id}"] = {}
             contributors[f"{guild.id}"]["banned"] = []
             config = configparser.ConfigParser()
-            configPath = ap(f'{serverConfigs}\{guild.id}.ini')
             config.read(configPath)
             for section in range(1, len(config.sections())):
                 channelID = config.sections()[section]
@@ -2155,7 +2155,8 @@ async def on_guild_join(guild):
     print("Initializing guild commands.")
     if initialize["guildCommands"]:
         createGuildCommands(guild.id)
-    if not os.path.isfile(f'{serverConfigs}\{guild.id}.ini'):
+    configPath = os.path.join(serverConfigs,f"{guild.id}.ini")
+    if not os.path.isfile(configPath):
         createGuildConfig(guild.id)
     contributors[f"{guild.id}"] = {}
     contributors[f"{guild.id}"]["banned"] = []
@@ -2223,7 +2224,7 @@ async def promptConcluder(guildID, channelID, channel, promptCode):
         await promptUpdater(guildID, channelID, promptCode)
 
 async def logDisplay(user, promptCode):
-    fpath = f"{promptLogs}\{promptCode}.txt"
+    fpath = os.path.join(promptLogs,f"{promptCode}.txt")
     file = discord.File(fpath, f"Story_Log_{promptCode}.txt")
     await user.send(f"**Story Log for Prompt {promptCode}**", file=file)
 
@@ -2730,7 +2731,7 @@ async def on_interaction(data):
             if admin:
                 if iOpt[0]["value"] == "reset":
                     config = configparser.ConfigParser()
-                    configPath = ap(f'{serverConfigs}\{guildID}.ini')
+                    configPath = os.path.join(serverConfigs,f"{guildID}.ini")
                     config.read(configPath)
                     config[f'{channelID}'] = {}
                     with open(configPath, 'w') as configfile:
@@ -2952,7 +2953,7 @@ async def on_raw_reaction_add(payload):
                 await user.send("**User Guide**\nAll of my user-facing features can be accessed either through slash commands or reactions. I'll list both ways in this guide.\n*Contributing to a prompt, step-by-step*\n**1.**  Make sure your server admins have invited me to their server, configured a channel for my prompts to play out in, and generated a prompt.\n**2.**  You can join my prompt by reacting to it with ✅ or by using the /join command along with the prompt's 4-digit code either in the server or in my DMs. Once you've joined, I'll DM you with the alias your contributions will be made under. However, the prompt may not immediately begin if it has fewer than the minimum required contributors (this count updates on the prompt message).\n**3.**  Contributing is turn-based, and each player gets 30 minutes (default) to contribute. I'll DM you when it's your turn. That DM will get pinned, and has a set of reacitons you can use to control your turn. If you need a refresher on the prompt, react with 📝 and I'll DM it to you. If you'd like some context, react with 📚 and I'll DM you the three most recent contributions to the prompt.\n**4.**  Now it's your turn to start contributing. You can do this in two ways. You can use the /post slash command with the prompt number and the text you'd like to post, either in the relevant server or my DMs. The easier way, however, is to react with ▶️ to enter Play Mode. Play Mode lasts the rest of your turn, and while you're in it, anything you DM me (except slash commands) will get posted as a contribution to the prompt.\n**5.**  Your turn will end automatically after its designated duration is over. You can end it early with ⏩ or /pass. You can also drop from the prompt at any time with ❌ (on the DM I sent you when your turn started or the prompt itself) or /drop. If you don't post a contribution or pass your turn within the time limit, you will be dropped from the prompt for inactivity.\n If you'd like to toy with prompt generation, you can use /generate in my DMs and set up generation settings in our private channel.")
                 return
             if emoji == "🎊":
-                await user.send("**Admin Startup**\n*step-by-step guide to get me set up on your server*\n**1.**  Use this link to add me to your server:\n[temporarily disabled until Lewd Robin has a stable host server]\nOnce you've added me to your server, I'll need a minute or two to set up slash commands.\n**2.**  Make a channel for my prompts to run in. I will need the `View Channel, Send Message, Add Reactions, Manage Messages, and Read Message History` permissions here. Potential contributors to the prompts I generate here should have the `View Channel, Add Reactions, Read Message History, and Use Slash Commands` permissions here. They should *not* have the `Send Messages` persmission in this channel.\n**3.**  Create LewdRobin Admin and Moderator roles. By default, only server admins can configure my settings or run prompts. If you want other members of your server to be able to do so, you will have to create roles for them. These will control who can use which slash and reaction commands in this server. These roles can be called anything, and don't need to grant any actual Discord permissions. Once you've created these roles, you will need to copy their IDs. To do this enable developer mode (User Settings -> Advanced -> Developer Mode) and right click on the roles in the role interface. Use the /roles command and paste in the role IDs for the IDs you want to be LewdRobin Admins and Moderators.\n*Admins* can configure, /display and /reset settings, /ban and /unban_all contributors.\n*Moderators* can /run prompts, /pause and resume prompts, and /kick contributors.\n**4.**  Configure settings. I use default settings to start with, but they can be fine-tuned for each channel I run prompts in. See 📊 Prompt Configuration for more info.")
+                await user.send("**Admin Startup**\n*step-by-step guide to get me set up on your server*\n**1.**  Use this link to add me to your server:\n<https://discord.com/api/oauth2/authorize?client_id=839249838972862535&permissions=2147593280&scope=bot%20applications.commands>\nOnce you've added me to your server, I'll need a minute or two to set up slash commands.\n**2.**  Make a channel for my prompts to run in. I will need the `View Channel, Send Message, Add Reactions, Manage Messages, and Read Message History` permissions here. Potential contributors to the prompts I generate here should have the `View Channel, Add Reactions, Read Message History, and Use Slash Commands` permissions here. They should *not* have the `Send Messages` persmission in this channel.\n**3.**  Create LewdRobin Admin and Moderator roles. By default, only server admins can configure my settings or run prompts. If you want other members of your server to be able to do so, you will have to create roles for them. These will control who can use which slash and reaction commands in this server. These roles can be called anything, and don't need to grant any actual Discord permissions. Once you've created these roles, you will need to copy their IDs. To do this enable developer mode (User Settings -> Advanced -> Developer Mode) and right click on the roles in the role interface. Use the /roles command and paste in the role IDs for the IDs you want to be LewdRobin Admins and Moderators.\n*Admins* can configure, /display and /reset settings, /ban and /unban_all contributors.\n*Moderators* can /run prompts, /pause and resume prompts, and /kick contributors.\n**4.**  Configure settings. I use default settings to start with, but they can be fine-tuned for each channel I run prompts in. See 📊 Prompt Configuration for more info.")
                 return
             if emoji == "📊":
                 await user.send("**Prompt Configuration**\nThis will cover prompt settings configurable by people with the LewdRobin Admin role for your server. All settings have a server-wide default which is not (currently) modifiable. Any adjustments to settings are made on a channel-by-channel basis. Use /display_settings in a channel to create a message displaying its current settings. Modify settings with the commands listed below.\n**/Contributors**\n  turn_length – length in minutes of each contributor's turn\n  contributor_minimum – the minimum number of contributors a prompt needs before it can start\n  contributor_maximum – the most contributors a prompt can have at once\n**/categories**\n  [category]_on – whether prompts will generate this type of thing. At least one category must be turned on.\n  character_number – how many randomly generated characters will be created per prompt\n  play_number – how many play types will be generated per prompt\n**/environments**\nEnvironments and scenes both use these tags to determine the pool for generation. If any of an environment's tags are excluded here, it will be excluded; scenes are then drawn from a pool that matches the environment's tags.\n  [america/europe/japan] - environments set in this specific region\n  historical – environments set before 1980\n  modern – environments set between 1980 and 2030\n  futuristic – environments set after 2030\n  fantasy – environments with magical or fantasy-related elements\n**/character_types**\n  [type] – toggles whether this type of character is generated. If at least one of cis_men or cis_women are enabled, they will be given a weighted bias in the generation pool.\n**/species**\nIf humans are enabled, they will be given a weighted bias.\n  [species] – whether characters from this species group will be generated. May include multiple similar species.\n**/play**\n  [play type] – whether play recommendations from this activity group will be included. May include multiple similar activities.")
