@@ -27,7 +27,7 @@ If you'd like to toy with prompt generation, you can use /generate in my DMs and
 
 **1.**  Use this link to add LewdRobin to your server:
 
-\[Link Removed until Lewd Robin has a stable hosting solution\]
+<https://discord.com/api/oauth2/authorize?client_id=839249838972862535&permissions=2147593280&scope=bot%20applications.commands>
 
 Once you've added LewdRobin to your server, the bot will need a minute or two to set up slash commands.
 
