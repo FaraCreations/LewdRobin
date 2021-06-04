@@ -808,7 +808,7 @@ def existsCheck(j, url, post):
     if not exists:
         time.sleep(4)
         r = requests.post(url, headers=headers, json=post)
-        print(f'{post["name"]} command created.\nJSON: {r.text}')
+        print(f'{post["name"]} command created.')
 
 def createGuildCommands(guildID):    
     url = f"https://discord.com/api/v8/applications/{bot.user.id}/guilds/{guildID}/commands"
@@ -2136,15 +2136,12 @@ async def on_ready():
                 url = f"https://discord.com/api/v8/applications/{bot.user.id}/guilds/{guild.id}/commands"
                 p = requests.put(url, headers=headers, json={})       
         if initialize["globalCommands"]:
-            createGlobalCommands()
             print("Initializing global commands")
-            initialize["globalCommands"] = False
+            createGlobalCommands()
         if initialize["guildCommands"]:
             print("Initializing guild commands")
             async for guild in bot.fetch_guilds():
                 createGuildCommands(guild.id)
-            else:
-                initialize["guildCommands"] = False
         async for guild in bot.fetch_guilds():
             guildIDList.append(guild.id)
         initialize["on_ready"] = True
