@@ -13,7 +13,14 @@ import asyncio
 import socket
 
 # global variables
-botToken = "XXXXXX"
+# for this script to work, create a token.txt file in the same directory as your .py script, containing only your bot token
+ap = os.path.abspath
+main = os.path.dirname(ap(__file__))
+promptLogs = f'{main}/promptLogs'
+serverConfigs = f'{main}/serverConfigs'
+tokenPath = os.path.join(f'{main}', "token.txt")
+with open(tokenPath, "r") as f:
+    botToken = f.read()
 intents = discord.Intents.default()
 intents.bans = False
 intents.emojis = True
@@ -34,10 +41,6 @@ dtt = datetime.datetime
 ns = time.time_ns
 nsMinute = 60000000000
 bot = discord.Client(Intents=intents)
-ap = os.path.abspath
-main = os.path.dirname(ap(__file__))
-promptLogs = f'{main}/promptLogs'
-serverConfigs = f'{main}/serverConfigs'
 task = bot.loop.create_task
 initialize = {}
 initialize["on_ready"] = False
@@ -2947,7 +2950,7 @@ async def on_raw_reaction_add(payload):
                 return
             if emoji == "🪶":
                 await user.send("**About**\nI am a bot that facilitates anonymous collaborative erotic writing.\nI generate writing prompts from a configurable pool of environments, characters, scenes, and play types. Contributors then join my prompts anonymously and are assigned temporary aliases which their writing will be posted under.\nWith my prompt as a starting point, contributors take turns adding to the story. Each contributor gets a configurable amount of time to write before the turn passes to the next person in line.")
-                await user.send("**User Guide**\nAll of my user-facing features can be accessed either through slash commands or reactions. I'll list both ways in this guide.\n*Contributing to a prompt, step-by-step*\n**1.**  Make sure your server admins have invited me to their server, configured a channel for my prompts to play out in, and generated a prompt.\n**2.**  You can join my prompt by reacting to it with ✅ or by using the /join command along with the prompt's 4-digit code either in the server or in my DMs. Once you've joined, I'll DM you with the alias your contributions will be made under. However, the prompt may not immediately begin if it has fewer than the minimum required contributors (this count updates on the prompt message).\n**3.**  Contributing is turn-based, and each player gets 30 minutes (default) to contribute. I'll DM you when it's your turn. That DM will get pinned, and has a set of reacitons you can use to control your turn. If you need a refresher on the prompt, react with 📝 and I'll DM it to you. If you'd like some context, react with 📚 and I'll DM you the three most recent contributions to the prompt.\n**4.**  Now it's your turn to start contributing. You can do this in two ways. You can use the /post slash command with the prompt number and the text you'd like to post, either in the relevant server or my DMs. The easier way, however, is to react with ▶️ to enter Play Mode. Play Mode lasts the rest of your turn, and while you're in it, anything you DM me (except slash commands) will get posted as a contribution to the prompt.\n**5.**  Your turn will end automatically after its designated duration is over. You can end it early with ⏩ or /pass. You can also drop from the prompt at any time with ❌ (on the DM I sent you when your turn started or the prompt itself) or /drop. If you don't post a contribution or pass your turn within the time limit, you will be dropped from the prompt for inactivity.\n If you'd like to toy with prompt generation, you can use /generate in my DMs and set up generation settings in our private channel.")
+                await user.send("**User Guide**\nAll of my user-facing features can be accessed either through slash commands or reactions. I'll list both ways in this guide.\n*Contributing to a prompt, step-by-step*\n**1.**  Make sure your server admins have invited me to their server, configured a channel for my prompts to play out in, and generated a prompt.\n**2.**  You can join my prompt by reacting to it with ✅ or by using the /join command along with the prompt's 4-digit code either in the server or in my DMs. Once you've joined, I'll DM you with the alias your contributions will be made under. However, the prompt may not immediately begin if it has fewer than the minimum required contributors (this count updates on the prompt message).\n**3.**  Contributing is turn-based, and each player gets 30 minutes (default) to contribute. I'll DM you when it's your turn. That DM will get pinned, and has a set of reacitons you can use to control your turn. If you need a refresher on the prompt, react with 📝 and I'll DM it to you. If you'd like some context, react with 📚 and I'll DM you the three most recent contributions to the prompt.\n**4.**  Now it's your turn to start contributing. You can do this in two ways. You can use the /post slash command with the prompt number and the text you'd like to post, either in the relevant server or my DMs. The easier way, however, is to react with ▶️ to enter Play Mode. Play Mode lasts the rest of your turn, and while you're in it, anything you DM me (except slash commands) will get posted as a contribution to the prompt.\n**5.**  Your turn will end automatically after its designated duration is over. You can end it early with ⏩ or /pass. You can also drop from the prompt at any time with ❌ (on the DM I sent you when your turn started or the prompt itself) or /drop. If you don't post a contribution or pass your turn within the time limit, you will be dropped from the prompt for inactivity.\n Try /generate in my DMs for custom generations.")
                 return
             if emoji == "🎊":
                 await user.send("**Admin Startup**\n*step-by-step guide to get me set up on your server*\n**1.**  Use this link to add me to your server:\n<https://discord.com/api/oauth2/authorize?client_id=839249838972862535&permissions=2147593280&scope=bot%20applications.commands>\nOnce you've added me to your server, I'll need a minute or two to set up slash commands.\n**2.**  Make a channel for my prompts to run in. I will need the `View Channel, Send Message, Add Reactions, Manage Messages, and Read Message History` permissions here. Potential contributors to the prompts I generate here should have the `View Channel, Add Reactions, Read Message History, and Use Slash Commands` permissions here. They should *not* have the `Send Messages` persmission in this channel.\n**3.**  Create LewdRobin Admin and Moderator roles. By default, only server admins can configure my settings or run prompts. If you want other members of your server to be able to do so, you will have to create roles for them. These will control who can use which slash and reaction commands in this server. These roles can be called anything, and don't need to grant any actual Discord permissions. Once you've created these roles, you will need to copy their IDs. To do this enable developer mode (User Settings -> Advanced -> Developer Mode) and right click on the roles in the role interface. Use the /roles command and paste in the role IDs for the IDs you want to be LewdRobin Admins and Moderators.\n*Admins* can configure, /display and /reset settings, /ban and /unban_all contributors.\n*Moderators* can /run prompts, /pause and resume prompts, and /kick contributors.\n**4.**  Configure settings. I use default settings to start with, but they can be fine-tuned for each channel I run prompts in. See 📊 Prompt Configuration for more info.")
@@ -3084,12 +3087,14 @@ async def timer_loop():
                         if contributionsTimer != contributions:
                             task(action_pass(userID, promptCode, None, None, isInteraction=False, isDrop=False, isAutopass=True))
                     if action == "autorun":
-                        period = getConfigInt(guildID, channelID, "autoperiod")                         
-                        nextTime = ns() + nsMinute*period
-                        createTempTimer(nextTime, "autorun", guildID, channelID, None, None, None)
-                        channel = await bot.fetch_channel(channelID)
-                        await action_run(guildID, channelID, channel, None, None, isInteraction=False)
-                        contributors[f"{guildID}"][f"{channelID}"]["autoTime"] = nextTime
+                        conChannel = contributors[f"{guildID}"][f"{channelID}"]
+                        if len(conChannel["pool"]) >= getConfigInt(guildID, channelID, "contributor_minimum"):
+                            period = getConfigInt(guildID, channelID, "autoperiod")                         
+                            nextTime = ns() + nsMinute*period
+                            createTempTimer(nextTime, "autorun", guildID, channelID, None, None, None)
+                            channel = await bot.fetch_channel(channelID)
+                            await action_run(guildID, channelID, channel, None, None, isInteraction=False)
+                            conChannel["autoTime"] = nextTime
                     timers[timer] = None
             forDeletion = [timer for timer in timers if timers[timer] == None]
             for timer in forDeletion:
